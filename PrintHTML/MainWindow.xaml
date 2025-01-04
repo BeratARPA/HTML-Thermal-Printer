@@ -1,0 +1,39 @@
+﻿<Window x:Class="PrintHTML.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Yazdırma Şablonu" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <DockPanel Margin="0,0,0,5">
+                <Label Content="Yazıcı Seçin:" Width="100"/>
+                <ComboBox x:Name="cbPrinters" SelectionChanged="cbPrinters_SelectionChanged"/>
+            </DockPanel>
+        </StackPanel>
+        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="373"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" x:Name="txtHtmlContent" 
+                 AcceptsReturn="True" 
+                 TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto"
+                 HorizontalScrollBarVisibility="Auto"
+                 FontFamily="Consolas"
+                 Text="&lt;div style=&quot;text-align: center; color: red;&quot;&gt;YAZDIRMA ŞABLONU KULLANIM KILAVUZU&lt;/div&gt;&#x0a;&#x0a;&lt;F&gt;=&#x0a;&lt;T&gt;Metin Hizalama Örnekleri:&#x0a;&lt;L&gt;Bu metin sola hizalı&#x0a;&lt;C&gt;Bu metin ortalı&#x0a;&lt;R&gt;Bu metin sağa hizalı&#x0a;&#x0a;&lt;F&gt;=&#x0a;&#x0a;&lt;T&gt;Kalın Yazı Örnekleri:&#x0a;&lt;EB&gt;&#x0a;Bu metin kalın olacak&#x0a;&lt;DB&gt;&#x0a;&#x0a;&lt;F&gt;=&#x0a;&#x0a;&lt;T&gt;Tablo Örneği:&#x0a;&lt;J&gt;Ürün | Stok&#x0a;&lt;J&gt;Laptop | 25&#x0a;&lt;J&gt;Mouse | 100&#x0a;&lt;J&gt;Klavye | 50&#x0a;&#x0a;&lt;F&gt;=&#x0a;&#x0a;&lt;C&gt;beratarpa.com"/>
+            <FlowDocumentScrollViewer x:Name="flowDocumentScrollViewer" Grid.Column="1"/>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button x:Name="btnPreview" Content="Önizleme" Width="100" Margin="0,0,10,0" Click="btnPreview_Click"/>
+            <Button x:Name="btnPrint" Content="Yazdır" Width="100" Click="btnPrint_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,4 +1,4 @@
-# PrintHTML
+# HTML Thermal Printer
 
 ## Screenshot
 ![Interface](Images/Main.png)

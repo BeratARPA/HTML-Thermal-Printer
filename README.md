@@ -1,5 +1,61 @@
 # PrintHTML
 
+[EN]
+
+## About Project
+PrintHTML is a user-friendly WPF application that allows you to send HTML content directly to Windows printers. This application enables you to preview HTML content before printing and automatically detects all printers installed on the system.
+
+### Features
+- Direct HTML content printing
+- Print preview functionality
+- Automatic printer detection
+- User-friendly interface
+- Error handling and notifications
+
+### Technical Details
+- Framework: .NET (WPF)
+- Language: C#
+- Interface: XAML
+- Architecture: Service-based architecture
+
+### Usage
+1. Launch the application
+2. System printers will be automatically listed
+3. Paste your HTML content into the text box
+4. Optionally click "Preview" to check the output
+5. Select a printer and click "Print"
+
+### Requirements
+- Windows operating system
+- .NET Framework
+- At least one system printer 
+
+### Special Format Tags
+Special format tags you can use in the application:
+
+- `<L>` : Aligns text to the left
+- `<C>` : Centers the text
+- `<R>` : Aligns text to the right
+- `<T>` : Makes text bold
+- `<EB>` : Bold text start
+- `<DB>` : Bold text end
+- `<F>=` : Fills the line with the specified character (example: `<F>=` fills the entire line with = character)
+- `<J>` : Creates a table. Columns are separated by | character (example: `<J>Product | Price | Stock`)
+
+Example usage:
+```
+<div style="text-align: center; color: red;">HEADER</div>
+
+<F>=
+<T>Bold Header
+<L>Left aligned text
+<C>Centered text
+<R>Right aligned text
+
+<J>Product | Price
+<J>Pencil | $10 
+```
+---
 [TR]
 
 ## Proje Hakkında
@@ -55,60 +111,3 @@ Uygulama içerisinde kullanabileceğiniz özel format etiketleri:
 <J>Ürün | Fiyat
 <J>Kalem | 10 TL
 ```
-
----
-
-[EN]
-
-## About Project
-PrintHTML is a user-friendly WPF application that allows you to send HTML content directly to Windows printers. This application enables you to preview HTML content before printing and automatically detects all printers installed on the system.
-
-### Features
-- Direct HTML content printing
-- Print preview functionality
-- Automatic printer detection
-- User-friendly interface
-- Error handling and notifications
-
-### Technical Details
-- Framework: .NET (WPF)
-- Language: C#
-- Interface: XAML
-- Architecture: Service-based architecture
-
-### Usage
-1. Launch the application
-2. System printers will be automatically listed
-3. Paste your HTML content into the text box
-4. Optionally click "Preview" to check the output
-5. Select a printer and click "Print"
-
-### Requirements
-- Windows operating system
-- .NET Framework
-- At least one system printer 
-
-### Special Format Tags
-Special format tags you can use in the application:
-
-- `<L>` : Aligns text to the left
-- `<C>` : Centers the text
-- `<R>` : Aligns text to the right
-- `<T>` : Makes text bold
-- `<EB>` : Bold text start
-- `<DB>` : Bold text end
-- `<F>=` : Fills the line with the specified character (example: `<F>=` fills the entire line with = character)
-- `<J>` : Creates a table. Columns are separated by | character (example: `<J>Product | Price | Stock`)
-
-Example usage:
-```
-<div style="text-align: center; color: red;">HEADER</div>
-
-<F>=
-<T>Bold Header
-<L>Left aligned text
-<C>Centered text
-<R>Right aligned text
-
-<J>Product | Price
-<J>Pencil | $10 

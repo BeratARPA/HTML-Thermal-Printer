@@ -3,74 +3,65 @@ using PrintHTML.HtmlConverter;
 using System;
 using System.Printing;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Xps;
 
 namespace PrintHTML.Services
 {
-    public class HtmlPrinterService
+    public class PrinterService
     {
-        public async Task PrintAsync(string[] content, string printerName)
+        private int _charactersPerLine;
+        public void SetCharactersPerLine(int charactersPerLine)
+        {
+            _charactersPerLine = charactersPerLine;
+        }
+
+        public void DoPrint(string content, string printerName, int charactersPerLine = 42)
         {
             try
             {
-                var formattedHtml = await FormatHtmlContentAsync(content);
+                SetCharactersPerLine(charactersPerLine);
+                string[] lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                var formattedHtml = FormatHtmlContentAsync(lines);
                 var xamlContent = ConvertHtmlToXaml(formattedHtml);
                 var flowDocument = CreateFlowDocument(xamlContent);
 
                 PrintDocument(flowDocument, printerName);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                throw new Exception("Yazdırma işlemi başarısız", ex);
+                throw new Exception("Printing failed.", exception);
             }
         }
 
-        public async Task<FlowDocument> GeneratePreview(string htmlContent)
+        private string FormatHtmlContentAsync(string[] content)
         {
-            try
+            var htmlBuilder = new StringBuilder();
+
+            // Varsayılan stiller
+            htmlBuilder.AppendLine(@"<style type='text/css'>
+                html { font-family: 'Consolas'; font-size: 12px; }
+                div { margin: 0; }
+            </style>"
+            );
+
+            // İçeriği formatla
+            foreach (var line in content)
             {
-                var content = htmlContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                var formattedHtml = await FormatHtmlContentAsync(content);
-                var xamlContent = ConvertHtmlToXaml(formattedHtml);
-                return CreateFlowDocument(xamlContent);
+                if (string.IsNullOrEmpty(line)) continue;
+
+                var formattedLine = HtmlFormattedDocument.FormatLine(line, _charactersPerLine);
+                htmlBuilder.AppendLine(formattedLine);
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Önizleme oluşturulamadı", ex);
-            }
+
+            return htmlBuilder.ToString();
         }
 
         private string ConvertHtmlToXaml(string html)
         {
             return HtmlToXamlConverter.ConvertHtmlToXaml(html, false);
-        }
-      
-        private async Task<string> FormatHtmlContentAsync(string[] content)
-        {
-            return await Task.Run(() =>
-            {
-                var htmlBuilder = new StringBuilder();
-
-                // Varsayılan stiller
-                htmlBuilder.AppendLine(@"<style type='text/css'>
-                html { font-family: 'Consolas', monospace; font-size: 12px; }
-                div { margin: 0; }
-            </style>");
-
-                // İçeriği formatla
-                foreach (var line in content)
-                {
-                    if (string.IsNullOrEmpty(line)) continue;
-
-                    var formattedLine = DocumentFormatter.FormatLine(line);
-                    htmlBuilder.AppendLine(formattedLine);
-                }
-
-                return htmlBuilder.ToString();
-            });
         }
 
         private FlowDocument CreateFlowDocument(string xamlContent)
@@ -78,11 +69,28 @@ namespace PrintHTML.Services
             return PrinterTools.XamlToFlowDocument(xamlContent);
         }
 
+        public FlowDocument GeneratePreview(string previewContent, int charactersPerLine = 42)
+        {
+            try
+            {
+                SetCharactersPerLine(charactersPerLine);
+                var content = previewContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                var formattedHtml = FormatHtmlContentAsync(content);
+                var xamlContent = ConvertHtmlToXaml(formattedHtml);
+                return CreateFlowDocument(xamlContent);
+            }
+            catch (Exception exception)
+            {
+                throw new Exception("Failed to create preview.", exception);
+            }
+        }                    
+
         private void PrintDocument(FlowDocument document, string printerName)
         {
             var printer = PrinterInfo.GetPrinter(printerName);
             if (printer == null)
-                throw new Exception($"Yazıcı bulunamadı: {printerName}");
+                throw new Exception($"No printer found: {printerName}");
 
             // Mevcut yazdırma metodunuzu burada kullanın
             PrintFlowDocument(printer, document);
@@ -111,16 +119,16 @@ namespace PrintHTML.Services
                                        Math.Max((double)pt.PageMediaSize.Height - (ia.OriginHeight + ia.ExtentHeight), t.Bottom));
 
                     document.ColumnWidth = double.PositiveInfinity;
-                    document.FontFamily = new System.Windows.Media.FontFamily("Segoe UI Semibold");
+                    document.FontFamily = new System.Windows.Media.FontFamily("Consolas");
                     //copy.PageWidth = 528; // allow the page to be the natural with of the output device
 
                     // Send content to the printer.
                     docWriter.Write(paginator);
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                throw new Exception($"Yazdırma işlemi sırasında hata: {ex.Message}", ex);
+                throw new Exception($"Error during printing process: {exception.Message}", exception);
             }
         }
     }

@@ -78,8 +78,8 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Services\DocumentFormatter.cs" />
-    <Compile Include="Services\HtmlPrinterService.cs" />
+    <Compile Include="Services\HtmlFormattedDocument.cs" />
+    <Compile Include="Services\PrinterService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

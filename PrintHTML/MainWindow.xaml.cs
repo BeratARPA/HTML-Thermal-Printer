@@ -14,87 +14,100 @@ namespace PrintHTML
     public partial class MainWindow : Window
     {
         private string _selectedPrinter;
-        private readonly HtmlPrinterService _printerService;
+        private int _charactersPerLine;
+        private readonly PrinterService _printerService = new PrinterService();
 
         public MainWindow()
         {
             InitializeComponent();
+
             LoadPrinters();
-            _printerService = new HtmlPrinterService();
         }
 
         private void LoadPrinters()
         {
             var printers = PrinterInfo.GetPrinterNames();
-            cbPrinters.ItemsSource = printers;
+            ComboBoxPrinters.ItemsSource = printers;
             if (printers.Any())
             {
-                cbPrinters.SelectedIndex = 0;
+                ComboBoxPrinters.SelectedIndex = 0;
             }
         }
 
-        private void btnPrint_Click(object sender, RoutedEventArgs e)
+        private void ButtonPrint_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (string.IsNullOrEmpty(_selectedPrinter))
                 {
-                    MessageBox.Show("Lütfen bir yazıcı seçin.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Please select a printer.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(txtHtmlContent.Text))
+                if (string.IsNullOrWhiteSpace(TextBoxContent.Text))
                 {
-                    MessageBox.Show("Yazdırılacak HTML içeriği boş olamaz.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("The content to be printed cannot be empty.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                btnPrint.IsEnabled = false;
+                ButtonPrint.IsEnabled = false;
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                var content = txtHtmlContent.Text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                AsyncPrintTask.Exec(true, () => _printerService.PrintAsync(content, _selectedPrinter));
+                var content = TextBoxContent.Text;
 
-                MessageBox.Show("Yazdırma işlemi başarıyla tamamlandı.", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
+                AsyncPrintTask.Exec(true, () => _printerService.DoPrint(content, _selectedPrinter, _charactersPerLine));
+
+                MessageBox.Show("The printing process was completed successfully.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                MessageBox.Show($"Yazdırma işlemi sırasında bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"An error occurred during printing: {exception.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
-                btnPrint.IsEnabled = true;
+                ButtonPrint.IsEnabled = true;
                 Mouse.OverrideCursor = null;
             }
         }
 
-        private async void btnPreview_Click(object sender, RoutedEventArgs e)
+        private void ButtonPreview_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var htmlContent = txtHtmlContent.Text;
+                var htmlContent = TextBoxContent.Text;
 
                 if (string.IsNullOrWhiteSpace(htmlContent))
                 {
-                    MessageBox.Show("Önizleme için HTML içeriği boş olamaz.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Content for preview cannot be empty.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                flowDocumentScrollViewer.Document = await _printerService.GeneratePreview(htmlContent);
-                
+                FlowDocumentScrollViewer.Document = _printerService.GeneratePreview(htmlContent, _charactersPerLine);
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Önizleme sırasında bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"An error occurred during preview: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void cbPrinters_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBoxPrinters_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cbPrinters.SelectedItem != null)
+            if (ComboBoxPrinters.SelectedItem != null)
             {
-                _selectedPrinter = cbPrinters.SelectedItem.ToString();
+                _selectedPrinter = ComboBoxPrinters.SelectedItem.ToString();
             }
+        }
+
+        private void TextBoxMaxWidth_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _charactersPerLine = Convert.ToInt16(TextBoxMaxWidth.Text);
+        }
+
+        private void TextBoxMaxWidth_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            // Yalnızca rakamlara izin ver
+            e.Handled = !e.Text.All(char.IsDigit);
         }
     }
 }

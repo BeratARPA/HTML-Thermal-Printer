@@ -22,12 +22,12 @@ namespace PrintHTML.Helpers
         private static void InternalExec(Action action)
         {
             try
-            {              
+            {
                 action.Invoke();
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                MessageBox.Show(e.Message);
+                MessageBox.Show($"There is a problem while printing.\n\nError Message: {exception.Message}");
             }
         }
     }

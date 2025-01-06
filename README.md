@@ -3,6 +3,24 @@
 I have converted the project to a NuGet package, if you want to use it as a package:
 https://www.nuget.org/packages/PrintHTML.Core
 
+Basic usage:
+```
+AsyncPrintTask.Exec(
+    true,
+    () => _printerService.DoPrint(
+        "content",                     // Content to print
+        "PrinterName",                // Printer name
+        "charactersPerLine(int) 58MM=32, 80MM=42"  // Characters per line
+    )
+);
+```
+---
+
+## Screenshots
+![UI](Images/3.png)
+![UI](Images/Main.png)
+![UI](Images/2.png)
+---
 [EN]
 
 ## About Project

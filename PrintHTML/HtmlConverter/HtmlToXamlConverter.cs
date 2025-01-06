@@ -2751,7 +2751,7 @@ namespace PrintHTML.HtmlConverter
             Debug.Assert(xamlTableCellElement.LocalName == XamlTableCell);
 
             // set default border thickness for xamlTableCellElement to enable gridlines
-            xamlTableCellElement.SetAttribute(XamlTableCellBorderThickness, "1,1,1,1");
+            xamlTableCellElement.SetAttribute(XamlTableCellBorderThickness, "0,0,0,0");
             xamlTableCellElement.SetAttribute(XamlTableCellBorderBrush, XamlBrushesBlack);
             var rowSpanString = GetAttribute(htmlChildNode, "rowspan");
             if (rowSpanString != null)

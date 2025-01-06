@@ -1,5 +1,8 @@
 # HTML Thermal Printer
 
+I have converted the project to a NuGet package, if you want to use it as a package:
+https://www.nuget.org/packages/PrintHTML.Core
+
 [EN]
 
 ## About Project

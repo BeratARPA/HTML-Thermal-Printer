@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace PrintHTML.HtmlConverter
+namespace PrintHTML.Core.HtmlConverter
 {
     /// <summary>
     ///     lexical analyzer class

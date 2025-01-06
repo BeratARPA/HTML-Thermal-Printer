@@ -1,7 +1,7 @@
 // // Copyright (c) Microsoft. All rights reserved.
 // // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace PrintHTML.HtmlConverter
+namespace PrintHTML.Core.HtmlConverter
 {
     /// <summary>
     ///     types of lexical tokens for html-to-xaml converter

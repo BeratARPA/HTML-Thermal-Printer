@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Xml;
 
-namespace PrintHTML.HtmlConverter
+namespace PrintHTML.Core.HtmlConverter
 {
     internal class CssStylesheet
     {

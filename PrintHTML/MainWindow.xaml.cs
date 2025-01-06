@@ -1,5 +1,5 @@
-﻿using PrintHTML.Helpers;
-using PrintHTML.Services;
+﻿using PrintHTML.Core.Helpers;
+using PrintHTML.Core.Services;
 using System;
 using System.Linq;
 using System.Windows;

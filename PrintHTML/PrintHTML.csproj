@@ -63,23 +63,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Helpers\AsyncPrintTask.cs" />
-    <Compile Include="Helpers\PrinterInfo.cs" />
-    <Compile Include="Helpers\PrinterTools.cs" />
-    <Compile Include="HtmlConverter\CssStylesheet.cs" />
-    <Compile Include="HtmlConverter\HtmlCSSParser.cs" />
-    <Compile Include="HtmlConverter\HtmlEncodedTextWriter.cs" />
-    <Compile Include="HtmlConverter\HtmlFromXamlConverter.cs" />
-    <Compile Include="HtmlConverter\HtmlLexicalAnalyzer.cs" />
-    <Compile Include="HtmlConverter\HtmlParser.cs" />
-    <Compile Include="HtmlConverter\HtmlSchema.cs" />
-    <Compile Include="HtmlConverter\HtmlTokenType.cs" />
-    <Compile Include="HtmlConverter\HtmlToXamlConverter.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Services\HtmlFormattedDocument.cs" />
-    <Compile Include="Services\PrinterService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -113,6 +99,11 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\PrintHTML.Core\PrintHTML.Core.csproj">
+      <Project>{8B9D186E-6373-4557-9ED0-6389ECFC9EF7}</Project>
+      <Name>PrintHTML.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

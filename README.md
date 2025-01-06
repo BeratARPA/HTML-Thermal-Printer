@@ -1,10 +1,5 @@
 # HTML Thermal Printer
 
-## Screenshot
-![Interface](Images/Main.png)
-![Interface](Images/3.png)
-![Interface](Images/2.png)
-
 [EN]
 
 ## About Project

@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Version>1.0.1</Version>
+		<Authors>BeratARPA</Authors>
+		<Company>BeratARPA</Company>
+		<Description>HTML printing solution for thermal printers.</Description>
+		<PackageProjectUrl>https://github.com/BeratARPA/HTML-Thermal-Printer</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/BeratARPA/HTML-Thermal-Printer</RepositoryUrl>
+		<PackageTags>print,html,thermal,printer</PackageTags>
+		<PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<Title>BeratARPA.ThermalPrinter.Html</Title>
+		<PackageIcon>Icon.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\..\..\Desktop\Icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="PresentationFramework">
+			<HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1\PresentationFramework.dll</HintPath>
+		</Reference>
+		<Reference Include="ReachFramework">
+			<HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1\ReachFramework.dll</HintPath>
+		</Reference>
+		<Reference Include="PresentationCore">
+			<HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1\PresentationCore.dll</HintPath>
+		</Reference>
+		<Reference Include="WindowsBase">
+			<HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1\WindowsBase.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Printing">
+			<HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1\System.Printing.dll</HintPath>
+		</Reference>
+		<Reference Include="System.Xaml">
+			<HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1\System.Xaml.dll</HintPath>
+		</Reference>
+	</ItemGroup>	
+
+</Project>

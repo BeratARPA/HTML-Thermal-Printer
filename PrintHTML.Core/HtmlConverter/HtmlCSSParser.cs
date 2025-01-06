@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xml;
 
-namespace PrintHTML.HtmlConverter
+namespace PrintHTML.Core.HtmlConverter
 {
     // DependencyProperty
 

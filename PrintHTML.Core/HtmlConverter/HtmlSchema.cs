@@ -4,7 +4,7 @@
 using System.Collections;
 using System.Diagnostics;
 
-namespace PrintHTML.HtmlConverter
+namespace PrintHTML.Core.HtmlConverter
 {
     /// <summary>
     ///     HtmlSchema class

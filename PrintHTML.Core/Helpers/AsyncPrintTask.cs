@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Threading;
 
-namespace PrintHTML.Helpers
+namespace PrintHTML.Core.Helpers
 {
     public class AsyncPrintTask
     {
@@ -27,7 +27,7 @@ namespace PrintHTML.Helpers
             }
             catch (Exception exception)
             {
-                MessageBox.Show($"There is a problem while printing.\n\nError Message: {exception.Message}");
+                throw new Exception($"There is a problem while printing.\n\nError Message: {exception.Message}");
             }
         }
     }

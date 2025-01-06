@@ -1,5 +1,5 @@
-﻿using PrintHTML.Helpers;
-using PrintHTML.HtmlConverter;
+﻿using PrintHTML.Core.Helpers;
+using PrintHTML.Core.HtmlConverter;
 using System;
 using System.Printing;
 using System.Text;
@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Xps;
 
-namespace PrintHTML.Services
+namespace PrintHTML.Core.Services
 {
     public class PrinterService
     {

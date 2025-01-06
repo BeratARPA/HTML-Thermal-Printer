@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 
-namespace PrintHTML.Helpers
+namespace PrintHTML.Core.Helpers
 {
     internal static class PrinterTools
     {

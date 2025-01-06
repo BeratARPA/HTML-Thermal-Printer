@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-namespace PrintHTML.HtmlConverter
+namespace PrintHTML.Core.HtmlConverter
 {
     /// <summary>
     ///     HtmlToXamlConverter is a static class that takes an HTML string

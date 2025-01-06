@@ -11,7 +11,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Xml;
 
-namespace PrintHTML.HtmlConverter
+namespace PrintHTML.Core.HtmlConverter
 {
     // DependencyProperty
 

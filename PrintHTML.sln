@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintHTML", "PrintHTML\PrintHTML.csproj", "{FDA43A8A-E39E-4374-AE87-04E726A0D4CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintHTML.Core", "PrintHTML.Core\PrintHTML.Core.csproj", "{8B9D186E-6373-4557-9ED0-6389ECFC9EF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{FDA43A8A-E39E-4374-AE87-04E726A0D4CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDA43A8A-E39E-4374-AE87-04E726A0D4CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDA43A8A-E39E-4374-AE87-04E726A0D4CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B9D186E-6373-4557-9ED0-6389ECFC9EF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B9D186E-6373-4557-9ED0-6389ECFC9EF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B9D186E-6373-4557-9ED0-6389ECFC9EF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B9D186E-6373-4557-9ED0-6389ECFC9EF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

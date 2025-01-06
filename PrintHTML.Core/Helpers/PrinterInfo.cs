@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Printing;
 
-namespace PrintHTML.Helpers
+namespace PrintHTML.Core.Helpers
 {
-    internal static class PrinterInfo
+    public static class PrinterInfo
     {
         private static LocalPrintServer _printServer;
         internal static LocalPrintServer PrintServer

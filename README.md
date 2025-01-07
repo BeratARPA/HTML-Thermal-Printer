@@ -5,6 +5,7 @@ https://www.nuget.org/packages/PrintHTML.Core
 
 Basic usage:
 ```
+PrinterService _printerService = new PrinterService();
 AsyncPrintTask.Exec(
     true,
     () => _printerService.DoPrint(

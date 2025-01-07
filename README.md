@@ -9,8 +9,8 @@ PrinterService _printerService = new PrinterService();
 AsyncPrintTask.Exec(
     true,
     () => _printerService.DoPrint(
-        "content",                     // Content to print
-        "PrinterName",                // Printer name
+        "content",                                 // Content to print
+        "PrinterName",                             // Printer name
         "charactersPerLine(int) 58MM=32, 80MM=42"  // Characters per line
     )
 );

@@ -101,7 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PrintHTML.Core\PrintHTML.Core.csproj">
-      <Project>{8B9D186E-6373-4557-9ED0-6389ECFC9EF7}</Project>
+      <Project>{8b9d186e-6373-4557-9ed0-6389ecfc9ef7}</Project>
       <Name>PrintHTML.Core</Name>
     </ProjectReference>
   </ItemGroup>

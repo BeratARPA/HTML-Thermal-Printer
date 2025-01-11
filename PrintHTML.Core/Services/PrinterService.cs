@@ -1,10 +1,16 @@
-﻿using PrintHTML.Core.Helpers;
+﻿using Figgle;
+using PrintHTML.Core.Helpers;
 using PrintHTML.Core.HtmlConverter;
 using System;
+using System.Linq;
 using System.Printing;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Windows.Xps;
 
 namespace PrintHTML.Core.Services
@@ -24,11 +30,15 @@ namespace PrintHTML.Core.Services
                 SetCharactersPerLine(charactersPerLine);
                 string[] lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
+                var asciiArtFlowDocument = ConvertASCIIArt(lines);
+
                 var formattedHtml = FormatHtmlContentAsync(lines);
                 var xamlContent = ConvertHtmlToXaml(formattedHtml);
                 var flowDocument = CreateFlowDocument(xamlContent);
 
-                PrintDocument(flowDocument, printerName);
+                var mergeFlowDocument = MergeFlowDocuments(asciiArtFlowDocument, flowDocument);
+
+                PrintDocument(mergeFlowDocument, printerName);
             }
             catch (Exception exception)
             {
@@ -44,8 +54,7 @@ namespace PrintHTML.Core.Services
             htmlBuilder.AppendLine(@"<style type='text/css'>
                 html { font-family: 'Consolas'; font-size: 12px; }
                 div { margin: 0; }
-            </style>"
-            );
+            </style>");
 
             // İçeriği formatla
             foreach (var line in content)
@@ -69,22 +78,95 @@ namespace PrintHTML.Core.Services
             return PrinterTools.XamlToFlowDocument(xamlContent);
         }
 
+        private FlowDocument ConvertASCIIArt(string[] lines)
+        {
+            // FlowDocument oluştur
+            var flowDocument = new FlowDocument();
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+                if (string.IsNullOrEmpty(line)) continue;
+
+                // Etiketleri tanımlamak için bir regex oluştur
+                var regex = new Regex(@"<([aA][sS][cC][iI][iI])>\[(.*?)\]", RegexOptions.None);
+
+                // Eşleşmeyi kontrol et
+                var match = regex.Match(line);
+                if (!match.Success) continue;
+
+                // Etiket içeriği (örneğin "C", "T" gibi)
+                var tag = match.Groups[1].Value;
+                if (string.IsNullOrEmpty(tag)) continue;
+
+                // Etiketlerden arındırılmış içerik (gerekliyse kullanılır)
+                var content = match.Groups[2].Value;
+
+                // ASCII sanatı oluştur
+                var fontStyle = FiggleFonts.Standard;
+                var asciiArt = fontStyle.Render(content);
+
+                // FlowDocument'e paragraf ekle
+                Paragraph paragraph = new Paragraph();
+                paragraph.Inlines.Add(new Run(asciiArt));
+                paragraph.FontFamily = new FontFamily("Consolas");
+                paragraph.FontSize = 10;
+
+                // Paragrafı FlowDocument'e ekle
+                flowDocument.Blocks.Add(paragraph);
+
+                // İşlenen satırı boşalt
+                lines[i] = string.Empty;
+            }
+
+            return flowDocument;
+        }
+
         public FlowDocument GeneratePreview(string previewContent, int charactersPerLine = 42)
         {
             try
             {
                 SetCharactersPerLine(charactersPerLine);
-                var content = previewContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var lines = previewContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                var formattedHtml = FormatHtmlContentAsync(content);
+                var asciiArtFlowDocument = ConvertASCIIArt(lines);
+
+                var formattedHtml = FormatHtmlContentAsync(lines);
                 var xamlContent = ConvertHtmlToXaml(formattedHtml);
-                return CreateFlowDocument(xamlContent);
+                var flowDocument = CreateFlowDocument(xamlContent);
+
+                return MergeFlowDocuments(asciiArtFlowDocument, flowDocument);
             }
             catch (Exception exception)
             {
                 throw new Exception("Failed to create preview.", exception);
             }
-        }                    
+        }
+
+        public FlowDocument MergeFlowDocuments(FlowDocument doc1, FlowDocument doc2)
+        {
+            FlowDocument mergedDoc = new FlowDocument();
+
+            // Birinci FlowDocument'teki blokları listeye al
+            var blocksDoc1 = doc1.Blocks.Cast<Block>().ToList();
+
+            // İkinci FlowDocument'teki blokları listeye al
+            var blocksDoc2 = doc2.Blocks.Cast<Block>().ToList();
+
+            // Birinci FlowDocument'in bloklarını birleştirilen belgeye ekle
+            foreach (var block in blocksDoc1)
+            {
+                mergedDoc.Blocks.Add(block);
+            }
+
+            // İkinci FlowDocument'in bloklarını birleştirilen belgeye ekle
+            foreach (var block in blocksDoc2)
+            {
+                mergedDoc.Blocks.Add(block);
+            }
+
+            return mergedDoc;
+        }
 
         private void PrintDocument(FlowDocument document, string printerName)
         {

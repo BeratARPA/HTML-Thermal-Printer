@@ -1,7 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Figgle;
+using PrintHTML.Core.Helpers;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Shapes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PrintHTML.Core.Services
 {
@@ -45,12 +50,12 @@ namespace PrintHTML.Core.Services
                 case "db":
                     return line.ToLower().Replace($"<{tag}>", "</b>") + "<br/>";
                 case "j":
-                    return CreateTable(line);
+                    return CreateTable(line);             
                 default:
                     return line.Replace($"<{tag}>", "");
             }
         }
-
+        
         private static string FormatFillLine(string line)
         {
             return string.Format("<span>{0}</span>", line[3].ToString().PadLeft(GetMaxWidth(), line[3]));

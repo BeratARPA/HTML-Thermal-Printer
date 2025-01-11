@@ -1,5 +1,30 @@
 # HTML Thermal Printer
 
+NuGet package:
+https://www.nuget.org/packages/PrintHTML.Core
+
+Basic usage:
+```
+PrinterService _printerService = new PrinterService();
+AsyncPrintTask.Exec(
+    true,
+    () => _printerService.DoPrint(
+        "content",                                       // Content to print
+        "PrinterName",                                   // Printer name
+        "charactersPerLine(int) 58MM=32, 80MM=42"        // Characters per line
+    )
+);
+
+FlowDocumentScrollViewer.Document = _printerService.GeneratePreview(htmlContent, _charactersPerLine); // Preview
+
+```
+---
+
+## Screenshots
+![UI](Images/3.png)
+![UI](Images/Main.png)
+![UI](Images/2.png)
+---
 [EN]
 
 ## About Project
@@ -33,6 +58,7 @@ PrintHTML is a user-friendly WPF application that allows you to send HTML conten
 ### Special Format Tags
 Special format tags you can use in the application:
 
+- `<ASCII>[content]` : Prints ASCII characters
 - `<L>` : Aligns text to the left
 - `<C>` : Centers the text
 - `<R>` : Aligns text to the right
@@ -40,7 +66,7 @@ Special format tags you can use in the application:
 - `<EB>` : Bold text start
 - `<DB>` : Bold text end
 - `<F>=` : Fills the line with the specified character (example: `<F>=` fills the entire line with = character)
-- `<J>` : Creates a table. Columns are separated by | character (example: `<J>Product | Price | Stock`)
+- `<J>` : Creates a table. Columns are separated by | character (example: `<J>Product | Price`)
 
 Example usage:
 ```
@@ -89,6 +115,7 @@ PrintHTML, HTML içeriğini doğrudan Windows yazıcılarına göndermenizi sağ
 ### Özel Format Etiketleri
 Uygulama içerisinde kullanabileceğiniz özel format etiketleri:
 
+- `<ASCII>[içerik]` : ASCII karakterlerini yazdırır
 - `<L>` : Metni sola hizalar
 - `<C>` : Metni ortalar
 - `<R>` : Metni sağa hizalar
@@ -96,7 +123,7 @@ Uygulama içerisinde kullanabileceğiniz özel format etiketleri:
 - `<EB>` : Kalın yazı başlangıcı
 - `<DB>` : Kalın yazı bitişi
 - `<F>=` : Belirtilen karakterle satırı doldurur (örnek: `<F>=` tüm satırı = karakteri ile doldurur)
-- `<J>` : Tablo oluşturur. Sütunlar | karakteri ile ayrılır (örnek: `<J>Ürün | Fiyat | Stok`)
+- `<J>` : Tablo oluşturur. Sütunlar | karakteri ile ayrılır (örnek: `<J>Ürün | Fiyat`)
 
 Örnek kullanım:
 ```

@@ -1,12 +1,14 @@
 // // Copyright (c) Microsoft. All rights reserved.
 // // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using PrintHTML.Core.HtmlConverter;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Xml;
@@ -240,7 +242,7 @@ namespace PrintHTML.Core.HtmlConverter
         {
             if (htmlNode is XmlComment)
             {
-                DefineInlineFragmentParent((XmlComment) htmlNode, /*xamlParentElement:*/null);
+                DefineInlineFragmentParent((XmlComment)htmlNode, /*xamlParentElement:*/null);
             }
             else if (htmlNode is XmlText)
             {
@@ -250,9 +252,9 @@ namespace PrintHTML.Core.HtmlConverter
             else if (htmlNode is XmlElement)
             {
                 // Identify element name
-                var htmlElement = (XmlElement) htmlNode;
+                var htmlElement = (XmlElement)htmlNode;
 
-                var htmlElementName = htmlElement.LocalName; // Keep the name case-sensitive to check xml names
+                var htmlElementName = htmlElement.LocalName.ToLower(); // Keep the name case-sensitive to check xml names
                 var htmlElementNamespace = htmlElement.NamespaceURI;
 
                 if (htmlElementNamespace != HtmlParser.XhtmlNamespace)
@@ -278,7 +280,7 @@ namespace PrintHTML.Core.HtmlConverter
                     case "body":
                     case "div":
                     case "form": // not a block according to xhtml spec
-                    case "pre": // Renders text in a fixed-width font
+                    case "pre": // Renders text in a fixed-width font                      
                     case "blockquote":
                     case "caption":
                     case "center":
@@ -361,7 +363,7 @@ namespace PrintHTML.Core.HtmlConverter
 
             // Return last processed node
             return htmlNode;
-        }
+        }      
 
         // .............................................................
         //
@@ -420,7 +422,7 @@ namespace PrintHTML.Core.HtmlConverter
             {
                 if (htmlChildNode is XmlElement)
                 {
-                    var htmlChildName = ((XmlElement) htmlChildNode).LocalName.ToLower();
+                    var htmlChildName = ((XmlElement)htmlChildNode).LocalName.ToLower();
                     if (HtmlSchema.IsBlockElement(htmlChildName))
                     {
                         htmlElementContainsBlocks = true;
@@ -548,7 +550,7 @@ namespace PrintHTML.Core.HtmlConverter
             {
                 if (htmlNode is XmlComment)
                 {
-                    DefineInlineFragmentParent((XmlComment) htmlNode, /*xamlParentElement:*/null);
+                    DefineInlineFragmentParent((XmlComment)htmlNode, /*xamlParentElement:*/null);
                 }
                 else if (htmlNode is XmlText)
                 {
@@ -559,13 +561,13 @@ namespace PrintHTML.Core.HtmlConverter
                 }
                 else if (htmlNode is XmlElement)
                 {
-                    var htmlChildName = ((XmlElement) htmlNode).LocalName.ToLower();
+                    var htmlChildName = ((XmlElement)htmlNode).LocalName.ToLower();
                     if (HtmlSchema.IsBlockElement(htmlChildName))
                     {
                         // The sequence of non-blocked inlines ended. Stop implicit loop here.
                         break;
                     }
-                    AddInline(xamlParagraph, (XmlElement) htmlNode, inheritedProperties, stylesheet, sourceContext);
+                    AddInline(xamlParagraph, (XmlElement)htmlNode, inheritedProperties, stylesheet, sourceContext);
                 }
 
                 // Store last processed node to return it at the end
@@ -596,7 +598,7 @@ namespace PrintHTML.Core.HtmlConverter
         {
             if (htmlNode is XmlComment)
             {
-                DefineInlineFragmentParent((XmlComment) htmlNode, xamlParentElement);
+                DefineInlineFragmentParent((XmlComment)htmlNode, xamlParentElement);
             }
             else if (htmlNode is XmlText)
             {
@@ -604,7 +606,7 @@ namespace PrintHTML.Core.HtmlConverter
             }
             else if (htmlNode is XmlElement)
             {
-                var htmlElement = (XmlElement) htmlNode;
+                var htmlElement = (XmlElement)htmlNode;
 
                 // Check whether this is an html element
                 if (htmlElement.NamespaceURI != HtmlParser.XhtmlNamespace)
@@ -659,7 +661,7 @@ namespace PrintHTML.Core.HtmlConverter
             {
                 if (htmlNode is XmlElement)
                 {
-                    var htmlChildName = ((XmlElement) htmlNode).LocalName.ToLower();
+                    var htmlChildName = ((XmlElement)htmlNode).LocalName.ToLower();
                     if (HtmlSchema.IsInlineElement(htmlChildName) || HtmlSchema.IsBlockElement(htmlChildName) ||
                         htmlChildName == "img" || htmlChildName == "br" || htmlChildName == "hr")
                     {
@@ -708,7 +710,7 @@ namespace PrintHTML.Core.HtmlConverter
 
             // Replace No-Breaks by spaces (160 is a code of &nbsp; entity in html)
             //  This is a work around since WPF/XAML does not support &nbsp.
-            textData = textData.Replace((char) 160, ' ');
+            textData = textData.Replace((char)160, ' ');
 
             if (textData.Length > 0)
             {
@@ -877,8 +879,8 @@ namespace PrintHTML.Core.HtmlConverter
             {
                 if (htmlChildNode is XmlElement && htmlChildNode.LocalName.ToLower() == "li")
                 {
-                    sourceContext.Add((XmlElement) htmlChildNode);
-                    AddListItem(xamlListElement, (XmlElement) htmlChildNode, currentProperties, stylesheet,
+                    sourceContext.Add((XmlElement)htmlChildNode);
+                    AddListItem(xamlListElement, (XmlElement)htmlChildNode, currentProperties, stylesheet,
                         sourceContext);
                     Debug.Assert(sourceContext.Count > 0 && sourceContext[sourceContext.Count - 1] == htmlChildNode);
                     sourceContext.RemoveAt(sourceContext.Count - 1);
@@ -925,7 +927,7 @@ namespace PrintHTML.Core.HtmlConverter
             if (xamlListItemElementPreviousSibling != null && xamlListItemElementPreviousSibling.LocalName == XamlList)
             {
                 // Previously added Xaml element was a list. We will add the new li to it
-                xamlListElement = (XmlElement) xamlListItemElementPreviousSibling;
+                xamlListElement = (XmlElement)xamlListItemElementPreviousSibling;
             }
             else
             {
@@ -944,8 +946,8 @@ namespace PrintHTML.Core.HtmlConverter
             // Use properties inherited from xamlParentElement for context 
             while (htmlChildNode != null && htmlChildNodeName == "li")
             {
-                AddListItem(xamlListElement, (XmlElement) htmlChildNode, inheritedProperties, stylesheet, sourceContext);
-                lastProcessedListItemElement = (XmlElement) htmlChildNode;
+                AddListItem(xamlListElement, (XmlElement)htmlChildNode, inheritedProperties, stylesheet, sourceContext);
+                lastProcessedListItemElement = (XmlElement)htmlChildNode;
                 htmlChildNode = htmlChildNode.NextSibling;
                 htmlChildNodeName = htmlChildNode?.LocalName.ToLower();
             }
@@ -1083,11 +1085,11 @@ namespace PrintHTML.Core.HtmlConverter
                             XamlNamespace);
                         xamlTableElement.AppendChild(xamlTableBodyElement);
 
-                        sourceContext.Add((XmlElement) htmlChildNode);
+                        sourceContext.Add((XmlElement)htmlChildNode);
 
                         // Get properties of Html tbody element
                         Hashtable tbodyElementLocalProperties;
-                        var tbodyElementCurrentProperties = GetElementProperties((XmlElement) htmlChildNode,
+                        var tbodyElementCurrentProperties = GetElementProperties((XmlElement)htmlChildNode,
                             currentProperties,
                             out tbodyElementLocalProperties, stylesheet, sourceContext);
                         // TODO: apply local properties for tbody
@@ -1176,7 +1178,7 @@ namespace PrintHTML.Core.HtmlConverter
                                     {
                                         return null;
                                     }
-                                    singleCell = (XmlElement) trChild;
+                                    singleCell = (XmlElement)trChild;
                                 }
                             }
                         }
@@ -1197,7 +1199,7 @@ namespace PrintHTML.Core.HtmlConverter
                             {
                                 return null;
                             }
-                            singleCell = (XmlElement) trChild;
+                            singleCell = (XmlElement)trChild;
                         }
                     }
                 }
@@ -1225,121 +1227,80 @@ namespace PrintHTML.Core.HtmlConverter
         /// <param name="stylesheet"></param>
         /// <param name="sourceContext"></param>
         private static void AddColumnInformation(XmlElement htmlTableElement, XmlElement xamlTableElement,
-            ArrayList columnStartsAllRows, Hashtable currentProperties, CssStylesheet stylesheet,
-            List<XmlElement> sourceContext)
+            ArrayList columnStarts, Hashtable currentProperties, CssStylesheet stylesheet, List<XmlElement> sourceContext)
         {
-            // Flow document table requires <Table.Columns> element to include <TableColumn/> element as 
-            // defined in https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/how-to-define-a-table-with-xaml
-            // Notic: CreateElement("Table", "Columns", XamlNamespace) would add xmlns attribute to <Table.Columns> and lead to XMLReader crash.
-            XmlElement xamlTableColumnGroupElement = xamlTableElement.OwnerDocument.CreateElement(null, XamlTableColumnGroup, XamlNamespace);
-            // Add column information
-            if (columnStartsAllRows != null)
-            {
-                // We have consistent information derived from table cells; use it
-                // The last element in columnStarts represents the end of the table
-                for (var columnIndex = 0; columnIndex < columnStartsAllRows.Count - 1; columnIndex++)
-                {
-                    XmlElement xamlColumnElement;
+            // XHTML namespace tan�m�
+            var nsManager = new XmlNamespaceManager(htmlTableElement.OwnerDocument.NameTable);
+            nsManager.AddNamespace("xhtml", "http://www.w3.org/1999/xhtml");
 
-                    xamlColumnElement = xamlTableColumnGroupElement.OwnerDocument.CreateElement(null, XamlTableColumn,
-                        XamlNamespace);
-                    xamlColumnElement.SetAttribute(XamlWidth,
-                        ((double) columnStartsAllRows[columnIndex + 1] - (double) columnStartsAllRows[columnIndex])
-                            .ToString(CultureInfo.InvariantCulture));
-                    xamlTableColumnGroupElement.AppendChild(xamlColumnElement);
-                }
-            }
-            else
+            var xamlTableColumnGroupElement = xamlTableElement.OwnerDocument.CreateElement(null, XamlTableColumnGroup, XamlNamespace);
+
+            // Namespace'li XPath sorgusu
+            var columns = htmlTableElement.SelectNodes(".//xhtml:thead//xhtml:th | .//xhtml:tr[1]/xhtml:td", nsManager);
+
+            if (columns == null || columns.Count == 0)
             {
-                // We do not have consistent information from table cells;
-                // Translate blindly colgroups from html.                
-                for (var htmlChildNode = htmlTableElement.FirstChild;
-                    htmlChildNode != null;
-                    htmlChildNode = htmlChildNode.NextSibling)
+                columns = htmlTableElement.SelectNodes(".//xhtml:tr[1]/*[self::xhtml:td or self::xhtml:th]", nsManager);
+            }
+
+            if (columns != null && columns.Count > 0)
+            {
+                foreach (XmlElement column in columns)
                 {
-                    if (htmlChildNode.LocalName.ToLower() == "colgroup")
+                    var xamlTableColumnElement = xamlTableElement.OwnerDocument.CreateElement(null, XamlTableColumn, XamlNamespace);
+
+                    var widthValue = GetAttribute(column, "width");
+                    if (string.IsNullOrEmpty(widthValue))
                     {
-                        // TODO: add column width information to this function as a parameter and process it
-                        AddTableColumnGroup(xamlTableColumnGroupElement, (XmlElement) htmlChildNode, currentProperties, stylesheet,
-                            sourceContext);
+                        var styleAttr = GetAttribute(column, "style");
+                        if (!string.IsNullOrEmpty(styleAttr))
+                        {
+                            widthValue = GetCssAttribute(styleAttr, "width");
+                        }
                     }
-                    else if (htmlChildNode.LocalName.ToLower() == "col")
+
+                    if (!string.IsNullOrEmpty(widthValue))
                     {
-                        AddTableColumn(xamlTableColumnGroupElement, (XmlElement) htmlChildNode, currentProperties, stylesheet,
-                            sourceContext);
+                        if (widthValue.EndsWith("%"))
+                        {
+                            var percentage = widthValue.TrimEnd('%');
+                            if (double.TryParse(percentage, out double value))
+                            {
+                                if (percentage == "100")
+                                    xamlTableColumnElement.SetAttribute("Width", $"*");
+                                else
+                                    xamlTableColumnElement.SetAttribute("Width", $"{value}*");
+                            }
+                        }
+                        else
+                        {
+                            if (widthValue.Contains("px"))
+                            {
+                                widthValue = widthValue.Replace("px", "");
+                            }
+                            if (double.TryParse(widthValue, out double pixelWidth))
+                            {
+                                xamlTableColumnElement.SetAttribute("Width", pixelWidth.ToString());
+                            }
+                        }
+
+                        xamlTableColumnGroupElement.AppendChild(xamlTableColumnElement);
                     }
-                    else if (htmlChildNode is XmlElement)
+                    else
                     {
-                        // Some element which belongs to table body. Stop column loop.
-                        break;
+                        //�lk s�tun i�in % 50, ikinci s�tun i�in % 50 geni�lik ayarla
+                        var columnIndex = xamlTableColumnGroupElement.ChildNodes.Count;
+                        xamlTableColumnElement.SetAttribute("Width", columnIndex == 0 ? "50*" : "50*");
                     }
+
+
                 }
             }
+
             if (xamlTableColumnGroupElement.HasChildNodes)
             {
                 xamlTableElement.AppendChild(xamlTableColumnGroupElement);
             }
-        }
-
-        /// <summary>
-        ///     Converts htmlColgroupElement into Xaml TableColumnGroup element, and appends it to the parent
-        ///     xamlTableElement
-        /// </summary>
-        /// <param name="xamlTableColumnGroupElement">
-        ///     XmlElement representing Xaml Table element to which the converted column group should be added
-        /// </param>
-        /// <param name="htmlColgroupElement">
-        ///     XmlElement representing Html colgroup element to be converted
-        ///     <param name="inheritedProperties">
-        ///         Properties inherited from parent context
-        ///     </param>
-        private static void AddTableColumnGroup(XmlElement xamlTableColumnGroupElement, XmlElement htmlColgroupElement,
-            Hashtable inheritedProperties, CssStylesheet stylesheet, List<XmlElement> sourceContext)
-        {
-            Hashtable localProperties;
-            var currentProperties = GetElementProperties(htmlColgroupElement, inheritedProperties,
-                out localProperties,
-                stylesheet, sourceContext);
-
-            // TODO: process local properties for colgroup
-
-            // Process children of colgroup. Colgroup may contain only col elements.
-            for (var htmlNode = htmlColgroupElement.FirstChild; htmlNode != null; htmlNode = htmlNode.NextSibling)
-            {
-                if (htmlNode is XmlElement && htmlNode.LocalName.ToLower() == "col")
-                {
-                    AddTableColumn(xamlTableColumnGroupElement, (XmlElement) htmlNode, currentProperties, stylesheet, sourceContext);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Converts htmlColElement into Xaml TableColumn element, and appends it to the parent
-        ///     xamlTableColumnGroupElement
-        /// </summary>
-        /// <param name="xamlTableColumnGroupElement"></param>
-        /// <param name="htmlColElement">
-        ///     XmlElement representing Html col element to be converted
-        /// </param>
-        /// <param name="inheritedProperties">
-        ///     properties inherited from parent context
-        /// </param>
-        /// <param name="stylesheet"></param>
-        /// <param name="sourceContext"></param>
-        private static void AddTableColumn(XmlElement xamlTableColumnGroupElement, XmlElement htmlColElement,
-            Hashtable inheritedProperties, CssStylesheet stylesheet, List<XmlElement> sourceContext)
-        {
-            Hashtable localProperties;
-            var currentProperties = GetElementProperties(htmlColElement, inheritedProperties, out localProperties,
-                stylesheet, sourceContext);
-
-            var xamlTableColumnElement = xamlTableColumnGroupElement.OwnerDocument.CreateElement(null, XamlTableColumn,
-                XamlNamespace);
-
-            // TODO: process local properties for TableColumn element
-
-            // Col is an empty element, with no subtree 
-            xamlTableColumnGroupElement.AppendChild(xamlTableColumnElement);
         }
 
         /// <summary>
@@ -1387,11 +1348,11 @@ namespace PrintHTML.Core.HtmlConverter
                         XamlTableRow,
                         XamlNamespace);
 
-                    sourceContext.Add((XmlElement) htmlChildNode);
+                    sourceContext.Add((XmlElement)htmlChildNode);
 
                     // Get tr element properties
                     Hashtable trElementLocalProperties;
-                    var trElementCurrentProperties = GetElementProperties((XmlElement) htmlChildNode,
+                    var trElementCurrentProperties = GetElementProperties((XmlElement)htmlChildNode,
                         currentProperties,
                         out trElementLocalProperties, stylesheet, sourceContext);
                     // TODO: apply local properties to tr element
@@ -1481,31 +1442,33 @@ namespace PrintHTML.Core.HtmlConverter
                         XamlTableCell,
                         XamlNamespace);
 
-                    sourceContext.Add((XmlElement) htmlChildNode);
+                    sourceContext.Add((XmlElement)htmlChildNode);
 
                     Hashtable tdElementLocalProperties;
-                    var tdElementCurrentProperties = GetElementProperties((XmlElement) htmlChildNode,
-                        currentProperties,
-                        out tdElementLocalProperties, stylesheet, sourceContext);
+                    var tdElementCurrentProperties = GetElementProperties((XmlElement)htmlChildNode,
+                        currentProperties, out tdElementLocalProperties, stylesheet, sourceContext);
+
+                    // Apply all CSS properties to the cell
+                    ApplyLocalProperties(xamlTableCellElement, tdElementLocalProperties, isBlock: true);
 
                     // TODO: determine if localProperties can be used instead of htmlChildNode in this call, and if they can,
                     // make necessary changes and use them instead.
-                    ApplyPropertiesToTableCellElement((XmlElement) htmlChildNode, xamlTableCellElement);
+                    ApplyPropertiesToTableCellElement((XmlElement)htmlChildNode, xamlTableCellElement);
 
                     if (columnStarts != null)
                     {
                         Debug.Assert(columnIndex < columnStarts.Count - 1);
-                        while (columnIndex < activeRowSpans.Count && (int) activeRowSpans[columnIndex] > 0)
+                        while (columnIndex < activeRowSpans.Count && (int)activeRowSpans[columnIndex] > 0)
                         {
-                            activeRowSpans[columnIndex] = (int) activeRowSpans[columnIndex] - 1;
-                            Debug.Assert((int) activeRowSpans[columnIndex] >= 0);
+                            activeRowSpans[columnIndex] = (int)activeRowSpans[columnIndex] - 1;
+                            Debug.Assert((int)activeRowSpans[columnIndex] >= 0);
                             columnIndex++;
                         }
                         Debug.Assert(columnIndex < columnStarts.Count - 1);
-                        columnStart = (double) columnStarts[columnIndex];
-                        columnWidth = GetColumnWidth((XmlElement) htmlChildNode);
+                        columnStart = (double)columnStarts[columnIndex];
+                        columnWidth = GetColumnWidth((XmlElement)htmlChildNode);
                         columnSpan = CalculateColumnSpan(columnIndex, columnWidth, columnStarts);
-                        var rowSpan = GetRowSpan((XmlElement) htmlChildNode);
+                        var rowSpan = GetRowSpan((XmlElement)htmlChildNode);
 
                         // Column cannot have no span
                         Debug.Assert(columnSpan > 0);
@@ -1520,7 +1483,7 @@ namespace PrintHTML.Core.HtmlConverter
                         {
                             Debug.Assert(spannedColumnIndex < activeRowSpans.Count);
                             activeRowSpans[spannedColumnIndex] = (rowSpan - 1);
-                            Debug.Assert((int) activeRowSpans[spannedColumnIndex] >= 0);
+                            Debug.Assert((int)activeRowSpans[spannedColumnIndex] >= 0);
                         }
 
                         columnIndex = columnIndex + columnSpan;
@@ -1618,7 +1581,7 @@ namespace PrintHTML.Core.HtmlConverter
                 {
                     case "tbody":
                         // Tbody element, we should analyze its children for trows
-                        var tbodyWidth = AnalyzeTbodyStructure((XmlElement) htmlChildNode, columnStarts,
+                        var tbodyWidth = AnalyzeTbodyStructure((XmlElement)htmlChildNode, columnStarts,
                             activeRowSpans, tableWidth,
                             stylesheet);
                         if (tbodyWidth > tableWidth)
@@ -1635,7 +1598,7 @@ namespace PrintHTML.Core.HtmlConverter
                         break;
                     case "tr":
                         // Table row. Analyze column structure within row directly
-                        var trWidth = AnalyzeTrStructure((XmlElement) htmlChildNode, columnStarts, activeRowSpans,
+                        var trWidth = AnalyzeTrStructure((XmlElement)htmlChildNode, columnStarts, activeRowSpans,
                             tableWidth,
                             stylesheet);
                         if (trWidth > tableWidth)
@@ -1722,7 +1685,7 @@ namespace PrintHTML.Core.HtmlConverter
                 switch (htmlChildNode.LocalName.ToLower())
                 {
                     case "tr":
-                        var trWidth = AnalyzeTrStructure((XmlElement) htmlChildNode, columnStarts, activeRowSpans,
+                        var trWidth = AnalyzeTrStructure((XmlElement)htmlChildNode, columnStarts, activeRowSpans,
                             tbodyWidth,
                             stylesheet);
                         if (trWidth > tbodyWidth)
@@ -1793,16 +1756,16 @@ namespace PrintHTML.Core.HtmlConverter
             // Skip spanned columns to get to real column start
             if (columnIndex < activeRowSpans.Count)
             {
-                Debug.Assert((double) columnStarts[columnIndex] >= columnStart);
-                if ((double) columnStarts[columnIndex] == columnStart)
+                Debug.Assert((double)columnStarts[columnIndex] >= columnStart);
+                if ((double)columnStarts[columnIndex] == columnStart)
                 {
                     // The new column may be in a spanned area
-                    while (columnIndex < activeRowSpans.Count && (int) activeRowSpans[columnIndex] > 0)
+                    while (columnIndex < activeRowSpans.Count && (int)activeRowSpans[columnIndex] > 0)
                     {
-                        activeRowSpans[columnIndex] = (int) activeRowSpans[columnIndex] - 1;
-                        Debug.Assert((int) activeRowSpans[columnIndex] >= 0);
+                        activeRowSpans[columnIndex] = (int)activeRowSpans[columnIndex] - 1;
+                        Debug.Assert((int)activeRowSpans[columnIndex] >= 0);
                         columnIndex++;
-                        columnStart = (double) columnStarts[columnIndex];
+                        columnStart = (double)columnStarts[columnIndex];
                     }
                 }
             }
@@ -1819,8 +1782,8 @@ namespace PrintHTML.Core.HtmlConverter
                         Debug.Assert(columnIndex <= columnStarts.Count);
                         if (columnIndex < columnStarts.Count)
                         {
-                            Debug.Assert(columnStart <= (double) columnStarts[columnIndex]);
-                            if (columnStart < (double) columnStarts[columnIndex])
+                            Debug.Assert(columnStart <= (double)columnStarts[columnIndex]);
+                            if (columnStart < (double)columnStarts[columnIndex])
                             {
                                 columnStarts.Insert(columnIndex, columnStart);
                                 // There can be no row spans now - the column data will appear here
@@ -1839,11 +1802,11 @@ namespace PrintHTML.Core.HtmlConverter
                             columnStarts.Add(columnStart);
                             activeRowSpans.Add(0);
                         }
-                        columnWidth = GetColumnWidth((XmlElement) htmlChildNode);
+                        columnWidth = GetColumnWidth((XmlElement)htmlChildNode);
                         if (columnWidth != -1)
                         {
                             int nextColumnIndex;
-                            var rowSpan = GetRowSpan((XmlElement) htmlChildNode);
+                            var rowSpan = GetRowSpan((XmlElement)htmlChildNode);
 
                             nextColumnIndex = GetNextColumnIndex(columnIndex, columnWidth, columnStarts, activeRowSpans);
                             if (nextColumnIndex != -1)
@@ -1858,7 +1821,7 @@ namespace PrintHTML.Core.HtmlConverter
                                     spannedColumnIndex++)
                                 {
                                     activeRowSpans[spannedColumnIndex] = rowSpan - 1;
-                                    Debug.Assert((int) activeRowSpans[spannedColumnIndex] >= 0);
+                                    Debug.Assert((int)activeRowSpans[spannedColumnIndex] >= 0);
                                 }
 
                                 columnIndex = nextColumnIndex;
@@ -1868,17 +1831,17 @@ namespace PrintHTML.Core.HtmlConverter
 
                                 if (columnIndex < activeRowSpans.Count)
                                 {
-                                    Debug.Assert((double) columnStarts[columnIndex] >= columnStart);
-                                    if ((double) columnStarts[columnIndex] == columnStart)
+                                    Debug.Assert((double)columnStarts[columnIndex] >= columnStart);
+                                    if ((double)columnStarts[columnIndex] == columnStart)
                                     {
                                         // The new column may be in a spanned area
                                         while (columnIndex < activeRowSpans.Count &&
-                                               (int) activeRowSpans[columnIndex] > 0)
+                                               (int)activeRowSpans[columnIndex] > 0)
                                         {
-                                            activeRowSpans[columnIndex] = (int) activeRowSpans[columnIndex] - 1;
-                                            Debug.Assert((int) activeRowSpans[columnIndex] >= 0);
+                                            activeRowSpans[columnIndex] = (int)activeRowSpans[columnIndex] - 1;
+                                            Debug.Assert((int)activeRowSpans[columnIndex] >= 0);
                                             columnIndex++;
-                                            columnStart = (double) columnStarts[columnIndex];
+                                            columnStart = (double)columnStarts[columnIndex];
                                         }
                                     }
                                     // else: the new column does not start at the same time as a pre existing column
@@ -1970,13 +1933,13 @@ namespace PrintHTML.Core.HtmlConverter
             Debug.Assert(0 <= columnIndex && columnIndex <= columnStarts.Count);
             Debug.Assert(columnWidth > 0);
 
-            columnStart = (double) columnStarts[columnIndex];
+            columnStart = (double)columnStarts[columnIndex];
             spannedColumnIndex = columnIndex + 1;
 
             while (spannedColumnIndex < columnStarts.Count &&
-                   (double) columnStarts[spannedColumnIndex] < columnStart + columnWidth && spannedColumnIndex != -1)
+                   (double)columnStarts[spannedColumnIndex] < columnStart + columnWidth && spannedColumnIndex != -1)
             {
-                if ((int) activeRowSpans[spannedColumnIndex] > 0)
+                if ((int)activeRowSpans[spannedColumnIndex] > 0)
                 {
                     // The current column should span this area, but something else is already spanning it
                     // Not analyzable
@@ -2103,7 +2066,7 @@ namespace PrintHTML.Core.HtmlConverter
 
             Debug.Assert(columnStarts != null);
             Debug.Assert(columnIndex < columnStarts.Count - 1);
-            Debug.Assert((double) columnStarts[columnIndex] >= 0);
+            Debug.Assert((double)columnStarts[columnIndex] >= 0);
             Debug.Assert(columnWidth > 0);
 
             columnSpanningIndex = columnIndex;
@@ -2113,8 +2076,8 @@ namespace PrintHTML.Core.HtmlConverter
 
             while (columnSpanningValue < columnWidth && columnSpanningIndex < columnStarts.Count - 1)
             {
-                subColumnWidth = (double) columnStarts[columnSpanningIndex + 1] -
-                                 (double) columnStarts[columnSpanningIndex];
+                subColumnWidth = (double)columnStarts[columnSpanningIndex + 1] -
+                                 (double)columnStarts[columnSpanningIndex];
                 Debug.Assert(subColumnWidth > 0);
                 columnSpanningValue += subColumnWidth;
                 columnSpanningIndex++;
@@ -2145,8 +2108,8 @@ namespace PrintHTML.Core.HtmlConverter
 
             foreach (object t in columnStarts)
             {
-                Debug.Assert(columnStart < (double) t);
-                columnStart = (double) t;
+                Debug.Assert(columnStart < (double)t);
+                columnStart = (double)t;
             }
         }
 
@@ -2190,35 +2153,35 @@ namespace PrintHTML.Core.HtmlConverter
             var propertyEnumerator = localProperties.GetEnumerator();
             while (propertyEnumerator.MoveNext())
             {
-                switch ((string) propertyEnumerator.Key)
+                switch ((string)propertyEnumerator.Key)
                 {
                     case "font-family":
                         //  Convert from font-family value list into xaml FontFamily value
-                        xamlElement.SetAttribute(XamlFontFamily, (string) propertyEnumerator.Value);
+                        xamlElement.SetAttribute(XamlFontFamily, (string)propertyEnumerator.Value);
                         break;
                     case "font-style":
-                        xamlElement.SetAttribute(XamlFontStyle, (string) propertyEnumerator.Value);
+                        xamlElement.SetAttribute(XamlFontStyle, (string)propertyEnumerator.Value);
                         break;
                     case "font-variant":
                         //  Convert from font-variant into xaml property
                         break;
                     case "font-weight":
-                        xamlElement.SetAttribute(XamlFontWeight, (string) propertyEnumerator.Value);
+                        xamlElement.SetAttribute(XamlFontWeight, (string)propertyEnumerator.Value);
                         break;
                     case "font-size":
                         //  Convert from css size into FontSize
-                        xamlElement.SetAttribute(XamlFontSize, (string) propertyEnumerator.Value);
+                        xamlElement.SetAttribute(XamlFontSize, (string)propertyEnumerator.Value);
                         break;
                     case "color":
-                        SetPropertyValue(xamlElement, TextElement.ForegroundProperty, (string) propertyEnumerator.Value);
+                        SetPropertyValue(xamlElement, TextElement.ForegroundProperty, (string)propertyEnumerator.Value);
                         break;
                     case "background-color":
-                        SetPropertyValue(xamlElement, TextElement.BackgroundProperty, (string) propertyEnumerator.Value);
+                        SetPropertyValue(xamlElement, TextElement.BackgroundProperty, (string)propertyEnumerator.Value);
                         break;
                     case "text-decoration-underline":
                         if (!isBlock)
                         {
-                            if ((string) propertyEnumerator.Value == "true")
+                            if ((string)propertyEnumerator.Value == "true")
                             {
                                 xamlElement.SetAttribute(XamlTextDecorations, XamlTextDecorationsUnderline);
                             }
@@ -2240,69 +2203,70 @@ namespace PrintHTML.Core.HtmlConverter
                     case "text-indent":
                         if (isBlock)
                         {
-                            xamlElement.SetAttribute(XamlTextIndent, (string) propertyEnumerator.Value);
+                            xamlElement.SetAttribute(XamlTextIndent, (string)propertyEnumerator.Value);
                         }
                         break;
 
                     case "text-align":
                         if (isBlock)
                         {
-                            xamlElement.SetAttribute(XamlTextAlignment, (string) propertyEnumerator.Value);
+                            xamlElement.SetAttribute(XamlTextAlignment, (string)propertyEnumerator.Value);
                         }
                         break;
 
                     case "width":
+                        break;
                     case "height":
                         //  Decide what to do with width and height propeties
                         break;
 
                     case "margin-top":
                         marginSet = true;
-                        marginTop = (string) propertyEnumerator.Value;
+                        marginTop = (string)propertyEnumerator.Value;
                         break;
                     case "margin-right":
                         marginSet = true;
-                        marginRight = (string) propertyEnumerator.Value;
+                        marginRight = (string)propertyEnumerator.Value;
                         break;
                     case "margin-bottom":
                         marginSet = true;
-                        marginBottom = (string) propertyEnumerator.Value;
+                        marginBottom = (string)propertyEnumerator.Value;
                         break;
                     case "margin-left":
                         marginSet = true;
-                        marginLeft = (string) propertyEnumerator.Value;
+                        marginLeft = (string)propertyEnumerator.Value;
                         break;
 
                     case "padding-top":
                         paddingSet = true;
-                        paddingTop = (string) propertyEnumerator.Value;
+                        paddingTop = (string)propertyEnumerator.Value;
                         break;
                     case "padding-right":
                         paddingSet = true;
-                        paddingRight = (string) propertyEnumerator.Value;
+                        paddingRight = (string)propertyEnumerator.Value;
                         break;
                     case "padding-bottom":
                         paddingSet = true;
-                        paddingBottom = (string) propertyEnumerator.Value;
+                        paddingBottom = (string)propertyEnumerator.Value;
                         break;
                     case "padding-left":
                         paddingSet = true;
-                        paddingLeft = (string) propertyEnumerator.Value;
+                        paddingLeft = (string)propertyEnumerator.Value;
                         break;
 
                     // NOTE: css names for elementary border styles have side indications in the middle (top/bottom/left/right)
                     // In our internal notation we intentionally put them at the end - to unify processing in ParseCssRectangleProperty method
                     case "border-color-top":
-                        borderColor = (string) propertyEnumerator.Value;
+                        borderColor = (string)propertyEnumerator.Value;
                         break;
                     case "border-color-right":
-                        borderColor = (string) propertyEnumerator.Value;
+                        borderColor = (string)propertyEnumerator.Value;
                         break;
                     case "border-color-bottom":
-                        borderColor = (string) propertyEnumerator.Value;
+                        borderColor = (string)propertyEnumerator.Value;
                         break;
                     case "border-color-left":
-                        borderColor = (string) propertyEnumerator.Value;
+                        borderColor = (string)propertyEnumerator.Value;
                         break;
                     case "border-style-top":
                     case "border-style-right":
@@ -2312,26 +2276,26 @@ namespace PrintHTML.Core.HtmlConverter
                         break;
                     case "border-width-top":
                         borderThicknessSet = true;
-                        borderThicknessTop = (string) propertyEnumerator.Value;
+                        borderThicknessTop = (string)propertyEnumerator.Value;
                         break;
                     case "border-width-right":
                         borderThicknessSet = true;
-                        borderThicknessRight = (string) propertyEnumerator.Value;
+                        borderThicknessRight = (string)propertyEnumerator.Value;
                         break;
                     case "border-width-bottom":
                         borderThicknessSet = true;
-                        borderThicknessBottom = (string) propertyEnumerator.Value;
+                        borderThicknessBottom = (string)propertyEnumerator.Value;
                         break;
                     case "border-width-left":
                         borderThicknessSet = true;
-                        borderThicknessLeft = (string) propertyEnumerator.Value;
+                        borderThicknessLeft = (string)propertyEnumerator.Value;
                         break;
 
                     case "list-style-type":
                         if (xamlElement.LocalName == XamlList)
                         {
                             string markerStyle;
-                            switch (((string) propertyEnumerator.Value).ToLower())
+                            switch (((string)propertyEnumerator.Value).ToLower())
                             {
                                 case "disc":
                                     markerStyle = XamlListMarkerStyleDisc;
@@ -2536,7 +2500,7 @@ namespace PrintHTML.Core.HtmlConverter
                     attributeValue = GetAttribute(htmlElement, "size");
                     if (attributeValue != null)
                     {
-                        var fontSize = double.Parse(attributeValue)*(12.0/3.0);
+                        var fontSize = double.Parse(attributeValue) * (12.0 / 3.0);
                         if (fontSize < 1.0)
                         {
                             fontSize = 1.0;
@@ -2578,9 +2542,6 @@ namespace PrintHTML.Core.HtmlConverter
                     //  Set default div properties
                     break;
                 case "pre":
-                    localProperties["font-family"] = "Courier New"; // renders text in a fixed-width font
-                    localProperties["font-size"] = XamlFontSizeXxSmall;
-                    localProperties["text-align"] = "Left";
                     break;
                 case "blockquote":
                     localProperties["margin-left"] = "16";
@@ -2697,7 +2658,7 @@ namespace PrintHTML.Core.HtmlConverter
                     lengthAsString = lengthAsString.Substring(0, lengthAsString.Length - 2);
                     if (double.TryParse(lengthAsString, out length))
                     {
-                        length = (length*96.0)/72.0; // convert from points to pixels
+                        length = (length * 96.0) / 72.0; // convert from points to pixels
                     }
                     else
                     {
@@ -2759,7 +2720,6 @@ namespace PrintHTML.Core.HtmlConverter
                 xamlTableCellElement.SetAttribute(XamlTableCellRowSpan, rowSpanString);
             }
         }
-
         #endregion Private Methods
     }
 }

@@ -1,30 +1,5 @@
 # HTML Thermal Printer
 
-NuGet package:
-https://www.nuget.org/packages/PrintHTML.Core
-
-Basic usage:
-```
-PrinterService _printerService = new PrinterService();
-AsyncPrintTask.Exec(
-    true,
-    () => _printerService.DoPrint(
-        "content",                                       // Content to print
-        "PrinterName",                                   // Printer name
-        "charactersPerLine(int) 58MM=32, 80MM=42"        // Characters per line
-    )
-);
-
-FlowDocumentScrollViewer.Document = _printerService.GeneratePreview(htmlContent, _charactersPerLine); // Preview
-
-```
----
-
-## Screenshots
-![UI](Images/3.png)
-![UI](Images/Main.png)
-![UI](Images/2.png)
----
 [EN]
 
 ## About Project

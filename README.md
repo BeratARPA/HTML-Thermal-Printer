@@ -3,6 +3,8 @@
 NuGet package:
 https://www.nuget.org/packages/PrintHTML.Core
 
+Figgle was used for ASCII. https://github.com/drewnoakes/figgle
+
 Basic usage:
 ```
 PrinterService _printerService = new PrinterService();

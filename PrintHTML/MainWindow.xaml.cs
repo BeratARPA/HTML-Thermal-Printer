@@ -29,9 +29,7 @@ namespace PrintHTML
             var printers = PrinterInfo.GetPrinterNames();
             ComboBoxPrinters.ItemsSource = printers;
             if (printers.Any())
-            {
                 ComboBoxPrinters.SelectedIndex = 0;
-            }
         }
 
         private void ButtonPrint_Click(object sender, RoutedEventArgs e)
@@ -94,14 +92,17 @@ namespace PrintHTML
         private void ComboBoxPrinters_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ComboBoxPrinters.SelectedItem != null)
-            {
                 _selectedPrinter = ComboBoxPrinters.SelectedItem.ToString();
-            }
         }
 
         private void TextBoxMaxWidth_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _charactersPerLine = Convert.ToInt16(TextBoxMaxWidth.Text);
+            string text = TextBoxMaxWidth.Text;
+            if (!string.IsNullOrEmpty(text))
+                _charactersPerLine = Convert.ToInt16(TextBoxMaxWidth.Text);
+            else
+                _charactersPerLine = 42;
+
         }
 
         private void TextBoxMaxWidth_PreviewTextInput(object sender, TextCompositionEventArgs e)

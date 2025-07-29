@@ -1,7 +1,6 @@
 ﻿using Figgle;
-using System.Text;
 using System;
-using System.Text.RegularExpressions;
+using System.Text;
 
 namespace PrintHTML.Core.Formatters
 {

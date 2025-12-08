@@ -13,14 +13,13 @@ namespace PrintHTML.Core.Formatters
         {
             // <eb> etiketi bulunmuşsa <b> ile değiştir
             if (Tag.Tag.Trim().StartsWith("<eb>", StringComparison.OrdinalIgnoreCase))
-                Line = Tag.Tag.ToLower().Replace("<eb>", "<b>");
+                return "<b>";
 
             // <db> etiketi bulunmuşsa </b> ile değiştir
             if (Tag.Tag.Trim().StartsWith("<db>", StringComparison.OrdinalIgnoreCase))
-                Line = Tag.Tag.ToLower().Replace("<db>", "</b>")+ "<br/>";
+                return "</b><br/>";
 
-            // Satırı döndür
-            return $"<span>{Line}</span>";          
+            return "";
         }
     }
 }

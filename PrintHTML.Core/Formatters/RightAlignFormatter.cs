@@ -9,8 +9,7 @@
 
         public override string GetFormattedLine()
         {
-            var result = Line.PadLeft(MaxWidth, ' ') + "<br/>";
-
+            var result = Line.PadLeft(MaxWidth, ' ');
             return $"<span>{result.Replace(" ", "&nbsp;")}</span><br/>";
         }
     }

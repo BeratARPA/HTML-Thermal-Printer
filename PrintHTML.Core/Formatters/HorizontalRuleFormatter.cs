@@ -10,7 +10,7 @@
         public override string GetFormattedLine()
         {
             if (string.IsNullOrEmpty(Line))
-                return "<span></span>";
+                return "";
 
             char fillChar = Line.Length > 0 ? Line[0] : ' ';
             string result = new string(fillChar, MaxWidth);

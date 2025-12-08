@@ -37,7 +37,7 @@ namespace PrintHTML.Core.Formatters
                 htmlBuilder.Append("<br/>");
             }
 
-            return htmlBuilder.ToString();
+            return $"{htmlBuilder.ToString()}";
         }
     }
 }

@@ -24,31 +24,34 @@ namespace PrintHTML.Core.Formatters
         }
 
         private static ILineFormatter CreateLineFormatter(string documentLine, int maxWidth)
-        {
-            if (documentLine.ToLower().TrimStart().StartsWith("<l"))
+        {       
+            // Tek etiket için mevcut formatter'ları kullan
+            var lowerLine = documentLine.ToLower().TrimStart();
+
+            if (lowerLine.StartsWith("<l"))
                 return new LeftAlignFormatter(documentLine, maxWidth);
-            if (documentLine.ToLower().TrimStart().StartsWith("<r"))
+            if (lowerLine.StartsWith("<r"))
                 return new RightAlignFormatter(documentLine, maxWidth);
-            if (documentLine.ToLower().TrimStart().StartsWith("<c"))
+            if (lowerLine.StartsWith("<c"))
                 return new CenterAlignFormatter(documentLine, maxWidth);
-            if (documentLine.ToLower().TrimStart().StartsWith("<f>"))
+            if (lowerLine.StartsWith("<f>"))
                 return new HorizontalRuleFormatter(documentLine, maxWidth);
-            if (documentLine.ToLower().TrimStart().StartsWith("<t"))
+            if (lowerLine.StartsWith("<t"))
                 return new BoldFormatter(documentLine, maxWidth);
-            if (documentLine.ToLower().TrimStart().StartsWith("<bx"))
+            if (lowerLine.StartsWith("<bx"))
                 return new BoxFormatter(documentLine, maxWidth);
-            if (documentLine.ToLower().TrimStart().StartsWith("<j"))
-                return GetJustifiedFormatter(documentLine, maxWidth, false);           
-            if (documentLine.ToLower().TrimStart().StartsWith("<eb>") || documentLine.ToLower().StartsWith("<db>"))
+            if (lowerLine.StartsWith("<j"))
+                return GetJustifiedFormatter(documentLine, maxWidth, false);
+            if (lowerLine.StartsWith("<eb>") || lowerLine.StartsWith("<db>"))
                 return new MultiLineBoldFormatter(documentLine, maxWidth);
-            if (documentLine.ToLower().TrimStart().StartsWith("<ascii>"))
-                return new AsciiFormatter(documentLine, maxWidth);            
+            if (lowerLine.StartsWith("<ascii>"))
+                return new AsciiFormatter(documentLine, maxWidth);
 
             return new GenericFormatter(documentLine, maxWidth);
         }
 
         private static ILineFormatter GetJustifiedFormatter(string documentLine, int maxWidth, bool shouldBreak)
-        {           
+        {
             var match = Regex.Match(documentLine, "<[j|J][^:]+(:[^>]+)>");
             var mt = match.Success ? match.Groups[1].Value : "";
             var ratio = 1d;

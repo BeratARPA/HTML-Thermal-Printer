@@ -80,7 +80,7 @@ namespace PrintHTML
                     return;
                 }
 
-                FlowDocumentScrollViewer.Document = _printerService.GeneratePreview(htmlContent, _charactersPerLine);
+                FlowDocumentScrollViewer.Document = _printerService.GeneratePreview(htmlContent, _selectedPrinter, _charactersPerLine);
 
             }
             catch (Exception ex)

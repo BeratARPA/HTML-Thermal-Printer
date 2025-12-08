@@ -20,13 +20,24 @@ namespace PrintHTML.Core.Formatters
 
         private static int[] CalculateColumnWidths(string documentLine, int[] columnWidths)
         {
-            var parts = documentLine.Split('|');
-            if (columnWidths == null || columnWidths.Count() != parts.Length)
-                columnWidths = new int[parts.Count()];
-            for (int i = 0; i < parts.Count(); i++)
+            // Tag'ı kaldır
+            var cleanLine = documentLine;
+            if (cleanLine.ToLower().TrimStart().StartsWith("<j"))
             {
-                if (columnWidths[i] < GetLength(parts[i]))
-                    columnWidths[i] = GetLength(parts[i]);
+                var tagEnd = cleanLine.IndexOf('>');
+                if (tagEnd >= 0)
+                    cleanLine = cleanLine.Substring(tagEnd + 1);
+            }
+
+            var parts = cleanLine.Split('|');
+            if (columnWidths == null || columnWidths.Length != parts.Length)
+                columnWidths = new int[parts.Length];
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var partLength = GetLength(parts[i].Trim());
+                if (columnWidths[i] < partLength)
+                    columnWidths[i] = partLength;
             }
             return columnWidths;
         }
@@ -41,36 +52,40 @@ namespace PrintHTML.Core.Formatters
             // Satırı '|' karakterine göre sütunlara ayırıyoruz.
             string[] columns = line.Split('|');
             if (columns.Length == 0)
-                return line;
+                return line + "<br/>";
 
-            // Her sütunun uzunluğunu hesaplayalım.
-            int totalTextLength = 0;
-            foreach (var col in columns)
-            {
-                totalTextLength += col.Length;
-            }
+            int totalColumnWidth = columnWidths.Sum();
+            int columnCount = columns.Length;
 
-            int gapCount = columns.Length - 1;
-            int totalSpaces = maxWidth - totalTextLength;
+            // Kolonlar arası minimum boşluk (en az 2 karakter)
+            int minGap = 2;
+            int totalMinGaps = (columnCount - 1) * minGap;
 
-            // Eğer boşluk miktarı yetersizse, direk orijinal metni döndür.
-            //if (totalSpaces < gapCount)
-            //    return line; // Bu durumda satır genişliği aşılmıştır.
+            // Kalan boşluğu hesapla
+            int remainingSpace = maxWidth - totalColumnWidth - totalMinGaps;
 
-            // Her boşluk için temel boşluk sayısı ve fazladan boşluk sayısını hesapla.
-            int baseSpace = gapCount > 0 ? totalSpaces / gapCount : 0;
-            int extraSpace = gapCount > 0 ? totalSpaces % gapCount : 0;
+            // Ekstra boşluğu kolonlar arasına eşit dağıt
+            int extraSpacePerGap = columnCount > 1 ? remainingSpace / (columnCount - 1) : 0;
+            int extraSpaceRemainder = columnCount > 1 ? remainingSpace % (columnCount - 1) : 0;
 
-            // Sütunları ve aralarına &nbsp; ekleyerek yeni satırı oluştur.
+            if (extraSpacePerGap < 0) extraSpacePerGap = 0;
+
             StringBuilder sb = new StringBuilder();
+
             for (int i = 0; i < columns.Length; i++)
             {
-                sb.Append(columns[i]);
-                if (i < gapCount)
+                string colText = columns[i].Trim();
+                int targetWidth = columnWidths[i];
+
+                // Kolonu sabit genişliğe getir (sağa boşluk ekle)
+                string paddedCol = PadRight(colText, targetWidth);
+                sb.Append(paddedCol);
+
+                // Son kolon değilse, aradaki boşluğu ekle
+                if (i < columns.Length - 1)
                 {
-                    int gap = baseSpace + (i < extraSpace ? 1 : 0);
-                    // Her boşluk yerine gap kadar "&nbsp;" ekle.
-                    for (int j = 0; j < gap; j++)
+                    int gapSize = minGap + extraSpacePerGap + (i < extraSpaceRemainder ? 1 : 0);
+                    for (int j = 0; j < gapSize; j++)
                     {
                         sb.Append("&nbsp;");
                     }
@@ -78,6 +93,20 @@ namespace PrintHTML.Core.Formatters
             }
 
             return sb.ToString() + "<br/>";
+        }
+
+        private string PadRight(string text, int totalWidth)
+        {
+            int currentLength = GetLength(text);
+            StringBuilder sb = new StringBuilder(text);
+
+            while (currentLength < totalWidth)
+            {
+                sb.Append("&nbsp;");
+                currentLength++;
+            }
+
+            return sb.ToString();
         }
 
         public int[] GetColumnWidths()

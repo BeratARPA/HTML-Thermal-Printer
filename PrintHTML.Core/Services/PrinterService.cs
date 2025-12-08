@@ -12,6 +12,8 @@ namespace PrintHTML.Core.Services
 {
     public class PrinterService
     {
+        private const double CONSOLAS_WIDTH_RATIO = 0.6; // Consolas karakter genişlik/yükseklik oranı
+
         private int _charactersPerLine;
         public void SetCharactersPerLine(int charactersPerLine)
         {
@@ -25,10 +27,19 @@ namespace PrintHTML.Core.Services
                 SetCharactersPerLine(charactersPerLine);
                 string[] lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                var formattedHtml = FormatHtmlContentAsync(lines);
+                var printer = PrinterInfo.GetPrinter(printerName);
+                if (printer == null) throw new Exception($"No printer found: {printerName}");
+
+                var ia = printer.GetPrintCapabilities().PageImageableArea;
+                double printableWidth = ia?.ExtentWidth ?? 280;
+
+                // Dinamik font boyutu hesaplama
+                int fontSize = CalculateFontSize(printableWidth, charactersPerLine);
+
+                var formattedHtml = FormatHtmlContentAsync(lines, fontSize);
                 var xamlContent = ConvertHtmlToXaml(formattedHtml);
                 var flowDocument = CreateFlowDocument(xamlContent);
-           
+
                 PrintDocument(flowDocument, printerName);
             }
             catch (Exception exception)
@@ -37,40 +48,36 @@ namespace PrintHTML.Core.Services
             }
         }
 
-        private string FormatHtmlContentAsync(string[] content)
-        {
-            var htmlBuilder = new StringBuilder();
-
-            // Varsayılan stiller
-            htmlBuilder.AppendLine(@"<style type='text/css'>
-                html { font-family: 'Consolas'; font-size: 12px; }
-                div { margin: 0; }
-            </style>");
-
-            var text = new FormattedDocument(content, _charactersPerLine).GetFormattedText();
-            htmlBuilder.Append(text);
-
-            return htmlBuilder.ToString();
-        }
-
-        private string ConvertHtmlToXaml(string html)
-        {
-            return HtmlToXamlConverter.ConvertHtmlToXaml(html, false);
-        }
-
-        private FlowDocument CreateFlowDocument(string xamlContent)
-        {
-            return PrinterTools.XamlToFlowDocument(xamlContent);
-        }
-      
-        public FlowDocument GeneratePreview(string previewContent, int charactersPerLine = 42)
+        public FlowDocument GeneratePreview(string previewContent, string printerName = null, int charactersPerLine = 42)
         {
             try
             {
                 SetCharactersPerLine(charactersPerLine);
                 var lines = previewContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            
-                var formattedHtml = FormatHtmlContentAsync(lines);
+
+                int fontSize;
+
+                // Eğer yazıcı seçiliyse, aynı hesaplamayı kullan (tutarlılık için)
+                if (!string.IsNullOrEmpty(printerName))
+                {
+                    var printer = PrinterInfo.GetPrinter(printerName);
+                    if (printer != null)
+                    {
+                        var ia = printer.GetPrintCapabilities().PageImageableArea;
+                        double printableWidth = ia?.ExtentWidth ?? 280;
+                        fontSize = CalculateFontSize(printableWidth, charactersPerLine);
+                    }
+                    else
+                    {
+                        fontSize = GetDefaultPreviewFontSize(charactersPerLine);
+                    }
+                }
+                else
+                {
+                    fontSize = GetDefaultPreviewFontSize(charactersPerLine);
+                }
+
+                var formattedHtml = FormatHtmlContentAsync(lines, fontSize);
                 var xamlContent = ConvertHtmlToXaml(formattedHtml);
                 var flowDocument = CreateFlowDocument(xamlContent);
 
@@ -81,7 +88,60 @@ namespace PrintHTML.Core.Services
                 throw new Exception("Failed to create preview.", exception);
             }
         }
-     
+
+        private string FormatHtmlContentAsync(string[] content, int fontSize)
+        {
+            var htmlBuilder = new StringBuilder();
+
+            // Dinamik font-size kullanımı
+            htmlBuilder.AppendLine($@"<style type='text/css'>
+        html {{ font-family: 'Consolas'; font-size: {fontSize}px; }}
+        div {{ margin: 0; }}
+    </style>");
+
+            var text = new FormattedDocument(content, _charactersPerLine).GetFormattedText();
+            htmlBuilder.Append(text);
+
+            return htmlBuilder.ToString();
+        }
+
+        private int CalculateFontSize(double printableWidth, int charactersPerLine)
+        {
+            // Formül: printableWidth / (charactersPerLine * CONSOLAS_WIDTH_RATIO)
+            // WPF'de 1 birim = 1/96 inch, Consolas monospace font
+            double calculatedSize = printableWidth / (charactersPerLine * CONSOLAS_WIDTH_RATIO);
+
+            int fontSize = (int)Math.Round(calculatedSize);
+
+            // Sınırları uygula - daha geniş aralık
+            return Clamp(fontSize, 6, 20);
+        }
+
+        private static int Clamp(int value, int min, int max)
+        {
+            if (value < min) return min;
+            if (value > max) return max;
+            return value;
+        }
+
+        private int GetDefaultPreviewFontSize(int charactersPerLine)
+        {
+            // Yazıcı bilgisi yokken tahmini değerler
+            // 80mm ≈ 227 WPF units, 58mm ≈ 165 WPF units
+            double estimatedWidth = charactersPerLine >= 40 ? 227 : 165;
+            return CalculateFontSize(estimatedWidth, charactersPerLine);
+        }
+
+        private string ConvertHtmlToXaml(string html)
+        {
+            return HtmlToXamlConverter.ConvertHtmlToXaml(html, false);
+        }
+
+        private FlowDocument CreateFlowDocument(string xamlContent)
+        {
+            return PrinterTools.XamlToFlowDocument(xamlContent);
+        }     
+
         private void PrintDocument(FlowDocument document, string printerName)
         {
             var printer = PrinterInfo.GetPrinter(printerName);

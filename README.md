@@ -16,7 +16,7 @@ AsyncPrintTask.Exec(
     )
 );
 
-FlowDocumentScrollViewer.Document = _printerService.GeneratePreview(htmlContent, _charactersPerLine); // Preview
+FlowDocumentScrollViewer.Document = _printerService.GeneratePreview(htmlContent, "PrinterName", 42); // Preview
 
 ```
 ---

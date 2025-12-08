@@ -24,7 +24,10 @@ namespace PrintHTML.Core.Formatters
         }
 
         private static ILineFormatter CreateLineFormatter(string documentLine, int maxWidth)
-        {       
+        {
+            if (CompositeFormatter.HasMultipleTags(documentLine))
+                return new CompositeFormatter(documentLine, maxWidth);
+
             // Tek etiket için mevcut formatter'ları kullan
             var lowerLine = documentLine.ToLower().TrimStart();
 

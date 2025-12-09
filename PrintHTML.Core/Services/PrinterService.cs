@@ -2,6 +2,7 @@
 using PrintHTML.Core.Helpers;
 using PrintHTML.Core.HtmlConverter;
 using System;
+using System.Linq;
 using System.Printing;
 using System.Text;
 using System.Windows;
@@ -33,6 +34,9 @@ namespace PrintHTML.Core.Services
                 var ia = printer.GetPrintCapabilities().PageImageableArea;
                 double printableWidth = ia?.ExtentWidth ?? 280;
 
+                if (HasCashDrawerTag(lines))
+                    OpenCashDrawer(printerName);
+
                 // Dinamik font boyutu hesaplama
                 int fontSize = CalculateFontSize(printableWidth, charactersPerLine);
 
@@ -46,6 +50,18 @@ namespace PrintHTML.Core.Services
             {
                 throw new Exception("Printing failed.", exception);
             }
+        }
+
+        private bool HasCashDrawerTag(string[] lines)
+        {
+            // <CASHDRAWER>
+            return lines.Any(l => l.Trim().ToUpper() == "<CASHDRAWER>");
+        }
+
+        private void OpenCashDrawer(string printerName)
+        {
+            byte[] command = new byte[] { 27, 112, 0, 25, 250 };
+            RawPrinterHelper.SendBytesToPrinter(printerName, command);
         }
 
         public FlowDocument GeneratePreview(string previewContent, string printerName = null, int charactersPerLine = 42)
@@ -140,7 +156,7 @@ namespace PrintHTML.Core.Services
         private FlowDocument CreateFlowDocument(string xamlContent)
         {
             return PrinterTools.XamlToFlowDocument(xamlContent);
-        }     
+        }
 
         private void PrintDocument(FlowDocument document, string printerName)
         {

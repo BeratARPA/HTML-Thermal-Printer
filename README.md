@@ -60,7 +60,7 @@ PrintHTML is a user-friendly WPF application that allows you to send HTML conten
 ### Special Format Tags
 Special format tags you can use in the application:
 
-- `<ASCII>content` : Prints ASCII characters
+- `<ascii>content` : Prints ASCII characters
 - `<L>` : Aligns text to the left
 - `<C>` : Centers the text
 - `<R>` : Aligns text to the right
@@ -70,13 +70,14 @@ Special format tags you can use in the application:
 - `<F>=` : Fills the line with the specified character (example: `<F>=` fills the entire line with = character)
 - `<J>` : Creates a table. Columns are separated by | character (example: `<J>Product | Price`)
 - `<BX>` : Creates a bordered box around content (example: `<BX>Important Notice!`)
+- `<CASHDRAWER>` : Sends cash drawer opening code
 
 Example usage:
 ```
 <div style="text-align: center; color: red;">HEADER</div>
 
 <F>=
-<T>Bold Header
+<T><C>Bold Header
 <L>Left aligned text
 <C>Centered text
 <R>Right aligned text
@@ -118,7 +119,7 @@ PrintHTML, HTML içeriğini doğrudan Windows yazıcılarına göndermenizi sağ
 ### Özel Format Etiketleri
 Uygulama içerisinde kullanabileceğiniz özel format etiketleri:
 
-- `<ASCII>içerik` : ASCII karakterlerini yazdırır
+- `<ascii>içerik` : ASCII karakterlerini yazdırır
 - `<L>` : Metni sola hizalar
 - `<C>` : Metni ortalar
 - `<R>` : Metni sağa hizalar
@@ -128,13 +129,14 @@ Uygulama içerisinde kullanabileceğiniz özel format etiketleri:
 - `<F>=` : Belirtilen karakterle satırı doldurur (örnek: `<F>=` tüm satırı = karakteri ile doldurur)
 - `<J>` : Tablo oluşturur. Sütunlar | karakteri ile ayrılır (örnek: `<J>Ürün | Fiyat`)
 - `<BX>` : İçeriğin etrafına kenarlıklı kutu oluşturur (örnek: `<BX>Önemli Uyarı!`)
-
+- `<CASHDRAWER>` : Para çekmecesi açılış kodunu gönderir
+  
 Örnek kullanım:
 ```
 <div style="text-align: center; color: red;">BAŞLIK</div>
 
 <F>=
-<T>Kalın Başlık
+<T><C>Kalın Başlık
 <L>Sola dayalı metin
 <C>Ortalanmış metin
 <R>Sağa dayalı metin

@@ -22,7 +22,7 @@ FlowDocumentScrollViewer.Document = _printerService.GeneratePreview(htmlContent,
 ---
 
 ## Screenshots
-![UI](Images/1.png)
+![UI](Images/5.png)
 ![UI](Images/2.png)
 ![UI](Images/3.png)
 ![UI](Images/4.png)
@@ -69,7 +69,10 @@ Special format tags you can use in the application:
 - `<DB>` : Bold text end
 - `<F>=` : Fills the line with the specified character (example: `<F>=` fills the entire line with = character)
 - `<J>` : Creates a table. Columns are separated by | character (example: `<J>Product | Price`)
-- `<BX>` : Creates a bordered box around content (example: `<BX>Important Notice!`)
+- `<BX>` : Creates a bordered box around content
+- `<QR w:150 h:150>` : Generates a QR Code from the text. Width (w) and height (h) are optional
+- `<BARCODE:EAN13 w:150 h:150>` : Generates a Barcode. Type (e.g., EAN13, CODE128), width (w), and height (h) can be specified
+- `<picture w:150 h:150>` : Prints the image found at the specified local file path. Dimensions can be resized with w and h
 - `<CASHDRAWER>` : Sends cash drawer opening code
 
 Example usage:
@@ -119,16 +122,19 @@ PrintHTML, HTML içeriğini doğrudan Windows yazıcılarına göndermenizi sağ
 ### Özel Format Etiketleri
 Uygulama içerisinde kullanabileceğiniz özel format etiketleri:
 
-- `<ascii>içerik` : ASCII karakterlerini yazdırır
+- `<ascii>` : ASCII karakterlerini yazdırır
 - `<L>` : Metni sola hizalar
 - `<C>` : Metni ortalar
 - `<R>` : Metni sağa hizalar
 - `<T>` : Metni kalın yapar
 - `<EB>` : Kalın yazı başlangıcı
 - `<DB>` : Kalın yazı bitişi
-- `<F>=` : Belirtilen karakterle satırı doldurur (örnek: `<F>=` tüm satırı = karakteri ile doldurur)
+- `<F>` : Belirtilen karakterle satırı doldurur (örnek: `<F>=` tüm satırı = karakteri ile doldurur)
 - `<J>` : Tablo oluşturur. Sütunlar | karakteri ile ayrılır (örnek: `<J>Ürün | Fiyat`)
-- `<BX>` : İçeriğin etrafına kenarlıklı kutu oluşturur (örnek: `<BX>Önemli Uyarı!`)
+- `<BX>` : İçeriğin etrafına kenarlıklı kutu oluşturur 
+- `<QR w:150 h:150>` : Metinden QR Kod oluşturur. Genişlik (w) ve yükseklik (h) isteğe bağlıdır
+- `<BARCODE:EAN13 w:150 h:150>` : Barkod oluşturur. Tip (örn: EAN13, CODE128), genişlik (w) ve yükseklik (h) belirtilebilir
+- `<picture w:150 h:150>` : Belirtilen yerel dosya yolundaki resmi yazdırır. Boyutlar w ve h ile ayarlanabilir
 - `<CASHDRAWER>` : Para çekmecesi açılış kodunu gönderir
   
 Örnek kullanım:

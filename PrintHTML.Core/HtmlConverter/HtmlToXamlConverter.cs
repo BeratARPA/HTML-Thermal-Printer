@@ -1,14 +1,12 @@
 // // Copyright (c) Microsoft. All rights reserved.
 // // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using PrintHTML.Core.HtmlConverter;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Xml;
@@ -825,9 +823,64 @@ namespace PrintHTML.Core.HtmlConverter
         // .............................................................
 
         private static void AddImage(XmlElement xamlParentElement, XmlElement htmlElement, Hashtable inheritedProperties,
-            CssStylesheet stylesheet, List<XmlElement> sourceContext)
+      CssStylesheet stylesheet, List<XmlElement> sourceContext)
         {
-            //  Implement images
+            string src = GetAttribute(htmlElement, "src");
+            string width = GetAttribute(htmlElement, "width");
+            string height = GetAttribute(htmlElement, "height");
+            string alt = GetAttribute(htmlElement, "alt");
+
+            if (!string.IsNullOrEmpty(src))
+            {
+                // FlowDocument içinde resim göstermek için BlockUIContainer veya InlineUIContainer kullanılır.
+                // Ancak XAML string olarak oluşturduğumuz için standart Image tagini kullanacağız.
+                // FlowDocument doğrudan Image'i desteklemez, bir Container içine almalıyız.
+
+                XmlElement xamlImageContainer;
+                bool isBlock = false;
+
+                // Eğer parent bir Paragraph veya Span ise InlineUIContainer kullan
+                if (xamlParentElement.LocalName == XamlParagraph || xamlParentElement.LocalName == XamlSpan || xamlParentElement.LocalName == XamlRun)
+                {
+                    xamlImageContainer = xamlParentElement.OwnerDocument.CreateElement(null, "InlineUIContainer", XamlNamespace);
+                }
+                else
+                {
+                    // Aksi halde BlockUIContainer kullan
+                    xamlImageContainer = xamlParentElement.OwnerDocument.CreateElement(null, "BlockUIContainer", XamlNamespace);
+                    isBlock = true;
+                }
+
+                var xamlImage = xamlParentElement.OwnerDocument.CreateElement(null, "Image", XamlNamespace);
+
+                // Source özelliğini ayarla
+                xamlImage.SetAttribute("Source", src);
+
+                // Genişlik ve Yükseklik varsa ayarla
+                if (!string.IsNullOrEmpty(width))
+                {
+                    xamlImage.SetAttribute("Width", width.Replace("px", ""));
+                }
+                else
+                {
+                    // Genişlik yoksa style attribute'una bak
+                    string style = GetAttribute(htmlElement, "style");
+                    string styleWidth = GetCssAttribute(style, "width");
+                    if (!string.IsNullOrEmpty(styleWidth))
+                    {
+                        xamlImage.SetAttribute("Width", styleWidth.Replace("px", ""));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(height))
+                {
+                    xamlImage.SetAttribute("Height", height.Replace("px", ""));
+                }
+
+                // Resmi container'a, container'ı parent'a ekle
+                xamlImageContainer.AppendChild(xamlImage);
+                xamlParentElement.AppendChild(xamlImageContainer);
+            }
         }
 
         // .............................................................

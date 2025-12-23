@@ -22,21 +22,39 @@ namespace PrintHTML.Core.Formatters
             const string br = "┘";
             const string vl = "│";
             const string hl = "─";
-            const string s = " ";
+            const char s = ' '; // Normal boşluk kullanıp en son replace yapacağız
 
             if (expandLabel) line = ExpandLabel(line);
 
+            // 1. Üst Çizgi (Top Line)
+            // (MaxWidth - 2) kadar çizgi, başında ve sonunda köşe karakterleri
+            string topLine = tl + new string(hl[0], MaxWidth - 2) + tr;
+
+            // 2. Orta Satır (Text Line)
+            // Metni ortalamak için padding hesapla
+            int totalPadding = (MaxWidth - 2) - line.Length;
+            int leftPad = totalPadding / 2;
+            int rightPad = totalPadding - leftPad; // Kalanı sağa ver
+
+            string middleLine = vl +
+                                new string(s, leftPad) +
+                                line +
+                                new string(s, rightPad) +
+                                vl;
+
+            // 3. Alt Çizgi (Bottom Line)
+            string bottomLine = bl + new string(hl[0], MaxWidth - 2) + br;
+
+            // HTML Formatına Çevir
+            // Boşlukları &nbsp; ile değiştir ki HTML'de daralmasın
+            // Font Consolas olduğu için &nbsp; genişliği harf genişliğine eşittir.
             var sb = new StringBuilder();
 
-            sb.AppendLine(tl + hl.PadLeft(MaxWidth - 2, hl[0]) + tr + "<br/>") ;
+            sb.Append("<span>" + topLine.Replace(" ", "&nbsp;") + "</span><br/>");
+            sb.Append("<span>" + middleLine.Replace(" ", "&nbsp;") + "</span><br/>");
+            sb.Append("<span>" + bottomLine.Replace(" ", "&nbsp;") + "</span><br/>");
 
-            string text = vl + line.PadLeft((((MaxWidth - 2) + line.Length) / 2), s[0]);
-
-            sb.AppendLine(text + vl.PadLeft(MaxWidth - text.Length, s[0]) + "<br/>");
-
-            sb.Append(bl + hl.PadLeft(MaxWidth - 2, hl[0]) + br);
-
-            return $"{sb.ToString()}<br/>";
+            return sb.ToString();
         }
     }
 }

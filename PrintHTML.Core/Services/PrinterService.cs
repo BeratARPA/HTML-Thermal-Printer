@@ -48,7 +48,7 @@ namespace PrintHTML.Core.Services
             }
             catch (Exception exception)
             {
-                throw new Exception("Printing failed.", exception);
+                throw new Exception("Printing failed:\n" + exception.ToString());
             }
         }
 
@@ -101,7 +101,7 @@ namespace PrintHTML.Core.Services
             }
             catch (Exception exception)
             {
-                throw new Exception("Failed to create preview.", exception);
+                throw new Exception("Failed to create preview:\n" + exception.ToString());
             }
         }
 
@@ -200,7 +200,7 @@ namespace PrintHTML.Core.Services
             }
             catch (Exception exception)
             {
-                throw new Exception($"Error during printing process: {exception.Message}", exception);
+                throw new Exception($"Error during printing process:\n" + exception.ToString());
             }
         }
     }

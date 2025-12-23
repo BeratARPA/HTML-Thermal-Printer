@@ -20,15 +20,35 @@ namespace PrintHTML.Core.Formatters
         private static string RemoveTag(string line)
         {
             if (IsDefinedTag(line))
-                return line.Substring(line.IndexOf(">", System.StringComparison.Ordinal) + 1);
-
+            {
+                // > karakterinden sonrasını al
+                int tagEndIndex = line.IndexOf(">", System.StringComparison.Ordinal);
+                if (tagEndIndex >= 0)
+                    return line.Substring(tagEndIndex + 1);
+            }
             return line;
+        }
+
+        protected int GetDimension(string key, int defaultValue)
+        {
+            // Tag.Tag özelliğinden veriyi çekeceğiz (Örn: <bar:CODE128 w:400 h:100>)
+            // Regex ile w: veya h: değerlerini bulalım.
+
+            // key "w" ise "w:(\d+)" arar.
+            var match = Regex.Match(Tag.Tag, $@"{key}:(\d+)", RegexOptions.IgnoreCase);
+
+            if (match.Success && int.TryParse(match.Groups[1].Value, out int result))
+            {
+                return result;
+            }
+
+            return defaultValue;
         }
 
         protected static bool IsDefinedTag(string line)
         {
             // Etiketleri tanımlamak için bir regex oluştur
-            var regex = new Regex(@"<(l|r|c|f|t|bx|j|p|eb|db|ascii)>", RegexOptions.IgnoreCase);
+            var regex = new Regex(@"<(l|r|c|f|t|bx|j|p|eb|db|ascii|qr|barcode|picture)([:\s][^>]*)?>", RegexOptions.IgnoreCase);
 
             // Etiketleri sırayla işle
             var match = regex.Match(line);

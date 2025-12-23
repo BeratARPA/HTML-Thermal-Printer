@@ -37,7 +37,7 @@ namespace PrintHTML.Core.Formatters
                 return new RightAlignFormatter(documentLine, maxWidth);
             if (lowerLine.StartsWith("<c"))
                 return new CenterAlignFormatter(documentLine, maxWidth);
-            if (lowerLine.StartsWith("<f>"))
+            if (lowerLine.StartsWith("<f"))
                 return new HorizontalRuleFormatter(documentLine, maxWidth);
             if (lowerLine.StartsWith("<t"))
                 return new BoldFormatter(documentLine, maxWidth);
@@ -45,10 +45,16 @@ namespace PrintHTML.Core.Formatters
                 return new BoxFormatter(documentLine, maxWidth);
             if (lowerLine.StartsWith("<j"))
                 return GetJustifiedFormatter(documentLine, maxWidth, false);
-            if (lowerLine.StartsWith("<eb>") || lowerLine.StartsWith("<db>"))
+            if (lowerLine.StartsWith("<eb") || lowerLine.StartsWith("<db"))
                 return new MultiLineBoldFormatter(documentLine, maxWidth);
-            if (lowerLine.StartsWith("<ascii>"))
+            if (lowerLine.StartsWith("<ascii"))
                 return new AsciiFormatter(documentLine, maxWidth);
+            if (lowerLine.StartsWith("<qr"))
+                return new QRCodeFormatter(documentLine, maxWidth);
+            if (lowerLine.StartsWith("<barcode"))
+                return new BarcodeFormatter(documentLine, maxWidth);
+            if (lowerLine.StartsWith("<picture"))
+                return new ImageFormatter(documentLine, maxWidth);
 
             return new GenericFormatter(documentLine, maxWidth);
         }
@@ -72,13 +78,12 @@ namespace PrintHTML.Core.Formatters
         {
             return _lineFormatters.Select(x => x.GetFormattedLine());
         }
-
+      
         public string GetFormattedText()
         {
             return _lineFormatters
                 .Select(x => x.GetFormattedLineWithoutTags())
-                .Where(x => !string.IsNullOrEmpty(x))
-                .Aggregate("", (current, s) => current + GetSeparator(current) + s);
+                .Aggregate("", (current, s) => current + s);
         }
 
         internal string GetSeparator(string current)

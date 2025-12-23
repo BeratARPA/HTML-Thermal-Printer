@@ -10,30 +10,32 @@ namespace PrintHTML.Core.Formatters
     {
         private readonly HashSet<string> _styleTags;      // t, eb, db
         private readonly string _alignmentTag;             // l, c, r
-        private readonly string _specialTag;               // f, j, ascii (bx kaldırıldı)
+        private readonly string _specialTag;               // f, j, ascii, barcode, qr, picture
+        private readonly string _fullSpecialTagString;     // <barcode:EAN13 w:200> gibi etiketin tam hali
         private readonly string _content;
         private readonly int _maxWidthValue;
 
         // Tüm desteklenen etiketler (bx kaldırıldı)
         private static readonly HashSet<string> StyleTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "t", "eb", "db" };
         private static readonly HashSet<string> AlignmentTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "l", "c", "r" };
-        private static readonly HashSet<string> SpecialTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "f", "j", "ascii" };
+        private static readonly HashSet<string> SpecialTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "f", "j", "ascii", "picture", "qr", "barcode" };
 
         public CompositeFormatter(string documentLine, int maxWidth)
             : base(documentLine, maxWidth)
         {
             _maxWidthValue = MaxWidth;
             _styleTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            _content = ExtractTagsAndContent(documentLine, out _alignmentTag, out _specialTag);
+            _content = ExtractTagsAndContent(documentLine, out _alignmentTag, out _specialTag, out _fullSpecialTagString);
         }
 
-        private string ExtractTagsAndContent(string line, out string alignmentTag, out string specialTag)
+        private string ExtractTagsAndContent(string line, out string alignmentTag, out string specialTag, out string fullSpecialTagString)
         {
             alignmentTag = null;
             specialTag = null;
+            fullSpecialTagString = null;
 
             // Tüm etiketleri bul (boyut bilgisi dahil) - bx hariç
-            var tagPattern = new Regex(@"<(t|l|c|r|eb|db|f|j|ascii)(\d{0,2})>", RegexOptions.IgnoreCase);
+            var tagPattern = new Regex(@"<(t|l|c|r|eb|db|f|j|ascii|picture|barcode|qr)(\d{0,2})([:\s][^>]*)?>", RegexOptions.IgnoreCase);
             var matches = tagPattern.Matches(line);
 
             string remainingContent = line;
@@ -53,6 +55,7 @@ namespace PrintHTML.Core.Formatters
                 else if (SpecialTags.Contains(tagName))
                 {
                     specialTag = tagName;
+                    fullSpecialTagString = match.Value;
                 }
 
                 // Etiketi içerikten kaldır
@@ -153,9 +156,55 @@ namespace PrintHTML.Core.Formatters
                     // ASCII art
                     return CreateAsciiArt(content);
 
+                case "qr":
+                case "barcode":
+                case "picture":
+                    return GenerateImageWithAlignment(content, specialTag);
+
                 default:
                     return content + "<br/>";
             }
+        }
+
+        private string GenerateImageWithAlignment(string content, string specialTag)
+        {
+            AbstractLineFormatter formatter = null;
+
+            // BarcodeFormatter constructor'ı "Tüm Satırı" bekler.
+            // Bu yüzden sakladığımız etiketi ve içeriği birleştirip sanki tek satırmış gibi veriyoruz.
+            // Örn: "<bar:EAN13 w:200>" + "123456789012" -> "<bar:EAN13 w:200>123456789012"
+            string reconstructedLine = _fullSpecialTagString + _content;
+
+            switch (_specialTag.ToLower())
+            {
+                case "qr":
+                    formatter = new QRCodeFormatter(reconstructedLine, _maxWidthValue);
+                    break;
+                case "barcode":
+                case "bar":
+                    formatter = new BarcodeFormatter(reconstructedLine, _maxWidthValue);
+                    break;
+                case "picture":
+                case "img":
+                    formatter = new ImageFormatter(reconstructedLine, _maxWidthValue);
+                    break;
+                default:
+                    return _content + "<br/>";
+            }
+
+            // Resim HTML'ini oluştur (<img src=... />)
+            string imageHtml = formatter.GetFormattedLine();
+
+            // <br/>'yi temizle, hizalama div'i içine biz ekleyeceğiz
+            imageHtml = imageHtml.Replace("<br/>", "");
+
+            // Hizalama Belirle (Varsayılan Sol)
+            string alignStyle = "left";
+            if (_alignmentTag == "c") alignStyle = "center";
+            if (_alignmentTag == "r") alignStyle = "right";
+
+            // HTML Div ile sarmala
+            return $"<div style='text-align:{alignStyle};'>{imageHtml}</div>";
         }
 
         private string CreateJustifiedLine(string content)
@@ -229,7 +278,7 @@ namespace PrintHTML.Core.Formatters
                 return false;
             }
 
-            var tagPattern = new Regex(@"<(t|l|c|r|eb|db|f|j|ascii)(\d{0,2})>", RegexOptions.IgnoreCase);
+            var tagPattern = new Regex(@"<(t|l|c|r|eb|db|f|j|ascii|picture|qr|barcode)(\d{0,2})([:\s][^>]*)?>", RegexOptions.IgnoreCase);
             return tagPattern.Matches(line).Count > 1;
         }
     }

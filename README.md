@@ -24,8 +24,6 @@ FlowDocumentScrollViewer.Document = _printerService.GeneratePreview(htmlContent,
 ## Screenshots
 ![UI](Images/5.png)
 ![UI](Images/2.png)
-![UI](Images/3.png)
-![UI](Images/4.png)
 ---
 [EN]
 

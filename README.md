@@ -1,8 +1,8 @@
 # HTML Thermal Printer
 
-NuGet package:https://www.nuget.org/packages/PrintHTML.Core
+NuGet package: https://www.nuget.org/packages/PrintHTML.Core
 
-Figgle was used for ASCII. https://github.com/drewnoakes/figgle
+Figgle was used for ASCII: https://github.com/drewnoakes/figgle
 
 Basic usage:
 ```
